@@ -9,7 +9,7 @@ public class ServerMain
 	{
 		System.out.println("waiting for connections");
 		Server server = new Server();
-		server.getConnections();
+		server.initialize();
 	}
 
 }

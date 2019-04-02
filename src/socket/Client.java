@@ -1,78 +1,113 @@
 package socket;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Scanner;
 
-public class Client 
+/**
+ * 
+ * @author Trae, Alayna
+ * 
+ * @version 1.0 (4/1/2019)
+ * 
+ * Singleton class that handles client (player) socket connection.
+ * Responsible for receiving Message Objects from other players.
+ * Responsible for sending Message Objects to other players. 
+ * 
+ *
+ */
+public class Client
 {
-	private Scanner console;		
-	private boolean closed = false;
-	private Socket socket;
-	private BufferedReader in;		// from server
-	private PrintWriter out;		// to server
+	/**
+	 * Private static variables.
+	 */
+	private static Client instance = null;
+	private static Socket socket;
+	private static ObjectInputStream in;		// from server
+	private static ObjectOutputStream out;		// to server
+
+	/**
+	 * Creates the Singleton instance of the Client class
+	 * @return Client Singleton
+	 */
+	public static Client getInstance()
+	{
+		if( instance == null)
+		{
+			instance = new Client();
+		}
+		
+		return instance;
+	}
 	
-	public Client()
+	/**
+	 * Private Client constructor.
+	 */
+	private Client()
+	{
+		initialize();
+	}
+
+	/**
+	 * Initializes the Client Socket connection.
+	 * Calls threaded listener function.
+	 */
+	private void initialize()
 	{
 		try
 		{
 			socket = new Socket("localhost", 4242);
-			console = new Scanner(System.in);
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			out = new PrintWriter(socket.getOutputStream(), true);
+			out = new ObjectOutputStream(socket.getOutputStream());
+			in = new ObjectInputStream(socket.getInputStream());
+
+
 			listenerThread();
-
-
-			System.out.println("Please enter your name");
-			String name = console.nextLine(); //blocks until keyboard input
-			send(name);
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
-		
-	}
-	
-	public void initialize()
-	{
-		this.connect();
+
 	}
 
 	/**
-	 * Get console input and send it to server;
-	 * stop & clean up when client has disconnected
+	 *  Receives socket Object sent over the server.
+	 * @param msg  Message Object received by the server.
+	 * 
+	 * @TODO: This method should add the received Object to a Threaded Queue to relieve processing 
+	 *        pressure from the main thread.
 	 */
-	private void connect()
+	private void receiveMessage(Object msg)
 	{
-		while (!closed)
+		System.out.println(msg);
+		// Do Something.
+		// Add Messages to A Queue for processing.
+		// Create A thread that processes messages.
+	}
+
+	/**
+	 *  Responsible for sending Message Objects over the socket to be received by other clients.
+	 * @param msg Message Object to be sent to the server/clients.
+	 */
+	public static void send(Object msg)
+	{
+		try
 		{
-			//console.nextLine() blocks until text is entered
-			send(console.nextLine());
+			out.writeObject(msg);
 		}
+		catch (IOException e){}
 	}
 
 	/**
-	 * This function is called when Player chooses to leave game.
+	 *  Threaded method that is responsible for monitoring socket connection for incoming messages
+	 *  from other clients.
+	 *  Responsible for maintaining socket connection.
 	 */
-	private void exit()
-	{
-		closed = true;
-	}
-	
-	public void send(String msg)
-	{
-		//called when have keyboard input
-		this.out.println(msg);
-	}
-	
 	private void listenerThread()
 	{
 
-    	Runnable listener = new Runnable() 
+    	Runnable listener = new Runnable()
     	{
             @Override
         	public void run()
@@ -80,38 +115,31 @@ public class Client
         		// Get lines from server; print to console
         		try
         		{
-        			String line;
-        			while ((line = in.readLine()) != null)
+        			while (!socket.isClosed())
         			{
-        				System.out.println(line);
+        				receiveMessage(in.readObject());
         			}
         		}
-        		catch (IOException e)
-        		{
-        			e.printStackTrace();
-        		}
+        		catch (IOException | ClassNotFoundException e){}
         		finally
         		{
-        			exit();
-        			System.out.println("server hung up");
+        			System.out.println("Server Disconnected.");
+        			try 
+        			{
+        				System.out.println("Closing socket connection.");
+        				out.close();
+        				in.close();
+        				socket.close();
+        			} 
+        			catch (IOException e1) 
+        			{
+        			}
         		}
 
-        		// Clean up
-        		try
-        		{
-        			out.close();
-        			in.close();
-        			socket.close();
-        		}
-        		catch (IOException e)
-        		{
-        			e.printStackTrace();
-        		}
         	}
-            
+
         };
         Thread clientListener = new Thread(listener);
         clientListener.start();
 	}
 }
-

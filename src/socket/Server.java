@@ -1,80 +1,112 @@
 package socket;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/**
+ * 
+ * @author trae, Alayna
+ * 
+ * @version 1.0 (4/1/2019)
+ * 
+ * This class is responsible for creating and maintaining the socket server and its functionality.
+ * Maintains server, keeps track of current socket connections, routes Message Objects to clients.
+ *
+ */
 public class Server
 {
-	private ServerSocket listen;						// for accepting connections
-	private ArrayList<ServerHandler> comms;	// all the connections with clients
+	/**
+	 * Private variables.
+	 */
+	private ServerSocket socketServer;			// for accepting connections
+	private ArrayList<ClientHandler> clients;	// all the connections with clients
 
+	/**
+	 * Public Server constructor.
+	 */
 	public Server()
 	{
-		try 
+	}
+
+	/**
+	 * This method manages Client socket connections.
+	 * 
+	 * @functionality: Creates Server Socket.
+	 * @functionality: Initializes clients data structure.
+	 * @functionality: Creates Client Connection Threads.
+	 * 
+	 * @TODO: Change the data structure responsible for maintaining list of clients.
+	 */
+	public void initialize()
+	{
+		try
 		{
-			this.listen = new ServerSocket(4242);
-			comms = new ArrayList<ServerHandler>();
-		} 
-		catch (IOException e) 
+			socketServer = new ServerSocket(4242);
+			clients = new ArrayList<ClientHandler>();
+		}
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
-	}
-	
-	/**
-	 * The usual loop of accepting connections and firing off new threads to handle them
-	 */
-	public void getConnections() 
-	{
+		
 		while (true)
 		{
-			ServerHandler comm;
-			try 
+			ClientHandler client;
+			try
 			{
-				comm = new ServerHandler(listen.accept(), this);
-				comm.setDaemon(true);
-				comm.start();
-				addCommunicator(comm);
-			} 
-			catch (IOException e) 
+				client = new ClientHandler(socketServer.accept(), this);
+				client.setDaemon(true);
+				client.start();
+				addClient(client);
+			}
+			catch (IOException e)
 			{
 				e.printStackTrace();
 			}
 
 		}
 	}
+	
 
 	/**
-	 * Adds the handler to the list of current client handlers
+	 * Adds Client connection thread to Data structure.
+	 * 
+	 * @param client: ClientHandler thread added to data structure
 	 */
-	private synchronized void addCommunicator(ServerHandler comm)
+	private synchronized void addClient(ClientHandler client)
 	{
-		comms.add(comm);
+		clients.add(client);
 	}
 
 	/**
-	 * Removes the handler from the list of current client handlers
+	 * Removes the Client connection from the list of current client connections.
+	 * 
+	 * @param client: ClientHandler thread to be removed from data structure.
 	 */
-	protected synchronized void removeCommunicator(ServerHandler comm)
+	protected synchronized void removeClient(ClientHandler client)
 	{
-		comms.remove(comm);
+		clients.remove(client);
 	}
 
 	/**
 	 * Sends the message from the one client handler to all the others (but not echoing back to the originator)
+	 * 
+	 * @param incomingClient: ClientHandler responsible for sending Message Object.
+	 * @param object:		  Message Object being sent over socket to other clients.
+	 * 
+	 * @TODO: Add functionality to see Message Object to individual Client.
 	 */
-	public synchronized void broadcast(ServerHandler from, String msg)
+	public synchronized void broadcast(ClientHandler incomingClient, Object object)
 	{
-		for (ServerHandler c : comms)
+		for (ClientHandler outgoingClient : clients)
 		{
-			if (c != from)
+			if (outgoingClient != incomingClient)
 			{
-				c.send(msg);
+				outgoingClient.send(object);
 			}
 		}
 	}
@@ -82,67 +114,92 @@ public class Server
 
 }
 
-class ServerHandler extends Thread
+/**
+ * 
+ * @author trae, Alayna
+ * 
+ * @version 1.0 (4/1/2019)
+ * 
+ * This class is a thread extension class designed to monitor incoming Message Objects sent by clients on a separate thread.
+ * This class is threaded to prevent blocking of the main class.
+ *
+ */
+class ClientHandler extends Thread
 {
-	private Socket sock;					// each instance is in a different thread and has its own socket
+	private Socket socket;					// each instance is in a different thread and has its own socket
 	private Server server;				// the main server instance
-	private String name;					// client's name (first interaction with server)
-	private BufferedReader in;				// from client
-	private PrintWriter out;				// to client
+	ObjectOutputStream out = null;
+	ObjectInputStream in = null;
 
-	public ServerHandler(Socket sock, Server server)
+	/**
+	 * Public constructor for ClientHandler.
+	 * 
+	 * @param sock:	 Newly connected client socket.
+	 * @param server Server class instance.
+	 */
+	public ClientHandler(Socket sock, Server server)
 	{
-		this.sock = sock;
+		this.socket = sock;
 		this.server = server;
 	}
 
+	/**
+	 * Override thread function responsible for monitoring socket connection for incoming Message Objects.
+	 */
 	public void run()
 	{
 		try
 		{
 			System.out.println("someone connected");
-
 			// Communication channel
-			in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-			out = new PrintWriter(sock.getOutputStream(), true);
+			out = new ObjectOutputStream(socket.getOutputStream());
+			in = new ObjectInputStream(socket.getInputStream());
 
-			// Identify -- first message is the name
-			name = in.readLine();
-			System.out.println("it's "+name);
-			out.println("welcome "+name);
-			server.broadcast(this, name + " entered the room");
+			//server.broadcast(this, "Someone Entered");
 
 			// Chat away
-			String line;
-			while ((line = in.readLine()) != null)
+			Object object;
+			while (!socket.isClosed())
 			{
-				String msg = name + ":" + line;
-				System.out.println(msg);
-				server.broadcast(this, msg);
+				
+				object = in.readObject();
+				server.broadcast(this, object);
 			}
+			
 
-			// Done
-			System.out.println(name + " hung up");
-			server.broadcast(this, name + " left the room");
-
-			// Clean up -- note that also remove self from server's list of handlers so it doesn't broadcast here
-			server.removeCommunicator(this);
-			out.close();
-			in.close();
-			sock.close();
 		}
-		catch (IOException e)
+		catch (IOException | ClassNotFoundException e)
 		{
-			e.printStackTrace();
+			try 
+			{
+				System.out.println("Closing socket connection.");
+				server.removeClient(this);
+				out.close();
+				in.close();
+				socket.close();
+			} 
+			catch (IOException e1) 
+			{
+			}
+			
 		}
+
 	}
 
 	/**
 	 * Sends a message to the client
-	 * @param msg
+	 * @param object Message Object to be sent to clients.
 	 */
-	public void send(String msg)
+	public void send(Object object)
 	{
-		out.println(msg);
+		try 
+		{
+
+			out.writeObject(object);
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
 	}
 }
