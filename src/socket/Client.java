@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+
 /**
  * 
  * @author Trae, Alayna
@@ -22,10 +23,15 @@ public class Client
 	/**
 	 * Private static variables.
 	 */
-	private static Client instance = null;
+	private static volatile Client instance = null;
 	private static Socket socket;
 	private static ObjectInputStream in;		// from server
 	private static ObjectOutputStream out;		// to server
+	private static boolean connected = false;
+	private static MessageReceiver msgReceiver = null;
+
+
+	
 
 	/**
 	 * Creates the Singleton instance of the Client class
@@ -33,11 +39,17 @@ public class Client
 	 */
 	public static Client getInstance()
 	{
+		
 		if( instance == null)
 		{
-			instance = new Client();
+			synchronized (Client.class)
+			{
+				if( instance == null)
+				{
+					instance = new Client();
+				}
+			}
 		}
-		
 		return instance;
 	}
 	
@@ -46,21 +58,41 @@ public class Client
 	 */
 	private Client()
 	{
-		initialize();
+        /**
+         *  This checks to ensure no other instance is created using Reflection API
+         */
+		if (instance != null)
+		{
+        	System.out.println("Exception Handled: Attempt to create new Instance using Reflection API");
+		}
+		else
+		{
+			if(initialize())
+			{
+        		System.out.println("Client Socket Started");
+			}
+		}
 	}
+
 
 	/**
 	 * Initializes the Client Socket connection.
 	 * Calls threaded listener function.
 	 */
-	private void initialize()
+	private boolean initialize()
 	{
 		try
 		{
+			msgReceiver = MessageReceiver.getInstance();
 			socket = new Socket("localhost", 4242);
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(socket.getInputStream());
-
+		    connected = true;
+		    
+		    if(connected == true)
+		    {
+		    	System.out.println("Client Connected.");
+		    }
 
 			listenerThread();
 		}
@@ -68,35 +100,60 @@ public class Client
 		{
 			e.printStackTrace();
 		}
-
+		
+		return true;
 	}
-
-	/**
-	 *  Receives socket Object sent over the server.
-	 * @param msg  Message Object received by the server.
-	 * 
-	 * @TODO: This method should add the received Object to a Threaded Queue to relieve processing 
-	 *        pressure from the main thread.
-	 */
-	private void receiveMessage(Object msg)
-	{
-		System.out.println(msg);
-		// Do Something.
-		// Add Messages to A Queue for processing.
-		// Create A thread that processes messages.
-	}
+	
 
 	/**
 	 *  Responsible for sending Message Objects over the socket to be received by other clients.
 	 * @param msg Message Object to be sent to the server/clients.
+	 * @return sent Boolean value whether message was sent or not
 	 */
-	public static void send(Object msg)
+	public static boolean send(Object msg)
 	{
+		boolean sent = false;
 		try
 		{
-			out.writeObject(msg);
+			if(!socket.isClosed()) 
+			{
+				System.out.println("--> Sending Object:   " + msg);
+				out.writeObject(msg);
+				sent = true;
+			}
 		}
 		catch (IOException e){}
+		return sent;
+	}
+	
+	/**
+	 * Responsible for closing client socket connection. 
+	 * @return closed: True if socket was closed. false if it wasnt.
+	 */
+	public static boolean closeConnection()
+	{
+		boolean closed = false;
+		
+		if (connected)
+		{
+			try 
+			{
+				System.out.println("Client Disconnected.");
+				out.close();
+				in.close();		
+				socket.close();
+				msgReceiver.close();
+				System.out.println("Closing socket connection.");
+				
+			} 
+			catch (IOException e) 
+			{
+				e.printStackTrace();
+			}		
+		}
+		connected = false;
+		return closed;
+		
 	}
 
 	/**
@@ -115,31 +172,34 @@ public class Client
         		// Get lines from server; print to console
         		try
         		{
-        			while (!socket.isClosed())
+        			while (connected)
         			{
-        				receiveMessage(in.readObject());
+        				msgReceiver.receiveIncomingMessage(in.readObject());
         			}
         		}
-        		catch (IOException | ClassNotFoundException e){}
-        		finally
+        		catch (IOException | ClassNotFoundException e)
         		{
-        			System.out.println("Server Disconnected.");
         			try 
         			{
-        				System.out.println("Closing socket connection.");
-        				out.close();
-        				in.close();
-        				socket.close();
+        				if(connected)
+        				{
+                			System.out.println("Server Disconnected.");
+        					out.close();
+        					in.close();
+        					socket.close();
+        					msgReceiver.close();
+        					System.out.println("Closing socket connection.");
+        					connected = false;
+        				}
         			} 
         			catch (IOException e1) 
         			{
         			}
         		}
-
         	}
-
         };
         Thread clientListener = new Thread(listener);
         clientListener.start();
 	}
+		
 }

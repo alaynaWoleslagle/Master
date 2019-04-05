@@ -64,7 +64,7 @@ public class Student implements Serializable
 	
 	public String toString() 
 	{
-		return getName() +" (" + getId() + "): Sent Message" ;
+		return "[ Student: " + getName() +", id: " + getId() + " ]" ;
 	}
 
 }
