@@ -1,8 +1,8 @@
 package Test;
 
-import java.util.Random;
-import messages.Student;
+
 import socket.Client;
+import utils.PlayerManager;
 
 public class Tester 
 {
@@ -18,14 +18,17 @@ public class Tester
 	public void socketTest()
 	{
 		Client.getInstance();
-	    Random r = new Random();
-		int id = r.nextInt((100 - 1) + 1) + 1;
+		PlayerManager.getInstance();
+	   // Random r = new Random();
+		//int id = r.nextInt((100 - 1) + 1) + 1;
 
-	    Student student = new Student(id, "TEST");
-	    
-		for(int i = 0; i < 250; i++)
+	    //Student student = new Student(id, "TEST");
+		System.out.println("Made it 1");
+		PlayerManager.initializePlayer("trae");
+
+		
+		/*for(int i = 0; i < 250; i++)
 		{
-		   Client.send(student);
 		   try 
 		   {
 			   Thread.sleep(r.nextInt((1000 - 500) + 1) + 500);
@@ -35,7 +38,7 @@ public class Tester
 			   // TODO Auto-generated catch block
 			   e.printStackTrace();
 		   }
-		}
+		}*/
 		
 	}
 }

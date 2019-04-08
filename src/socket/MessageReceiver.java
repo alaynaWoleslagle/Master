@@ -3,61 +3,30 @@ package socket;
 import java.util.LinkedList;
 import java.util.Queue;
 
-/**
- * 
- * @author Trae
- *
- * @version 1.0 (4/4/2019)
- * 
- * Singleton Class
- * This class is responsible for receiving Messages from the Queue.
- * Messages are added to a Queue which is will then be processed on a separate thread.
- * 
- * This class acts as an interface between the Client socket and main Game logic through the receipt of messages.
- */
-public class MessageReceiver 
+public abstract class MessageReceiver 
 {
-    private static volatile MessageReceiver msgReceiver = null;
-    private Queue<Object> queue = null;
-    private boolean running = false;
-    Thread processThread;
 	
-	private MessageReceiver()
-	{
-        /**
-         *  This checks to ensure no other instance is created using Reflection API
-         */
-        if (msgReceiver != null)
-        {
-        	System.out.println("Exception Handled: Attempt to create new Instance using Reflection API");
-        }
-        else
-        {
-        	if(initialize())
-        	{
-        		System.out.println("Message Receiver Started");
-        	}
-        }
-	}
-	
-    public static MessageReceiver getInstance() 
-    {
-        if (msgReceiver == null) 
-        { 
-        	/**
-        	 *  This is a thread-safe check to ensure another thread can't initialize another MessageReceiver class.
-        	 */
-            synchronized (MessageReceiver.class) 
-            {
-                if (msgReceiver == null)
-                {
-                	msgReceiver = new MessageReceiver();
-                }
-                
-            }
-        }
+    protected static Queue<Object> queue = null;
+    protected static boolean running = false;
+    protected Thread processThread;
 
-        return msgReceiver;
+    
+    
+    
+    /**
+     * @author Trae
+     * 
+     * Initializes Message Queue and Starts Message Processor Thread.
+     * 
+     * @return true: Message Processor Thread started.
+     */
+    protected boolean initialize()
+    {
+    	queue = new LinkedList<Object>();
+    	running = true;
+    	processThread();
+    	
+    	return true;
     }
     
     /**
@@ -65,7 +34,7 @@ public class MessageReceiver
      * 
      * This function clears out Message Queue and 
      */
-    public void close()
+    public static void close()
     {
     	/**
     	 * Setting Running flag to false exits loop for threaded process functions.
@@ -78,27 +47,11 @@ public class MessageReceiver
     /**
      * @author Trae
      * 
-     * Initializes Message Queue and Starts Message Processor Thread.
-     * 
-     * @return true: Message Processor Thread started.
-     */
-    private boolean initialize()
-    {
-    	queue = new LinkedList<Object>();
-    	running = true;
-    	processThread();
-    	
-    	return true;
-    }
-    
-    /**
-     * @author Trae
-     * 
      * Receives message from Client Socket and adds it to Message Queue to be processed.
      * 
      * @param msg: Message to be added to Message Queue.
      */
-    public synchronized void receiveIncomingMessage(Object msg)
+    protected synchronized static void receiveIncomingMessage(Object msg)
     {
     	queue.add(msg);
     }
@@ -110,23 +63,12 @@ public class MessageReceiver
      * 
      * @return 
      */
-    private synchronized Object pop()
+    protected synchronized Object pop()
     {
     	return queue.poll();
     }
     
-    /**
-     * TODO: This function routes incoming messages to for main processing.
-     * TODO: Game logic function should be called here. Function that receives Message and processes it.
-     * @param msg
-     */
-    private void processIncomingMessage(Object msg)
-    {
-    	System.out.println("--> Receiving Object:   "+msg);
-    }
-    
-
-	private void processThread()
+	protected void processThread()
 	{
 
     	Runnable listener = new Runnable()
@@ -166,5 +108,7 @@ public class MessageReceiver
         processThread.setDaemon(true);
         processThread.start();
 	}
+
+	protected abstract void processIncomingMessage(Object tmp);
     
 }

@@ -7,6 +7,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import messages.BaseMessage.MessageType;
+import messages.Player;
+
 /**
  * 
  * @author trae, Alayna
@@ -21,7 +24,7 @@ public class Server
 {
 	private static volatile Server instance = null;
 	private ServerSocket socketServer;			// for accepting connections
-	private ArrayList<ClientHandler> clients;	// all the connections with clients
+	private static ArrayList<ClientHandler> clients;	// all the connections with clients
 	
 
 	/**
@@ -76,6 +79,7 @@ public class Server
 	 */
 	private void initialize()
 	{
+		int index = 0;
 		try
 		{
 			socketServer = new ServerSocket(4242);
@@ -92,10 +96,12 @@ public class Server
 			ClientHandler client = null;
 			try
 			{
-				client = new ClientHandler(socketServer.accept(), this);
+				client = new ClientHandler(socketServer.accept());
+				client.setIndex(index);
 				client.setDaemon(true);
 				client.start();
 				addClient(client);
+				index++;
 				
 			}
 			catch (IOException e)
@@ -103,11 +109,9 @@ public class Server
 				e.printStackTrace();
 			}
 
-		}
-		
+		}		
 	}
 	
-		
 
 	/**
 	 * Adds Client connection thread to Data structure.
@@ -124,7 +128,7 @@ public class Server
 	 * 
 	 * @param client: ClientHandler thread to be removed from data structure.
 	 */
-	protected synchronized void removeClient(ClientHandler client)
+	protected synchronized static void removeClient(ClientHandler client)
 	{
 		clients.remove(client);
 	}
@@ -137,7 +141,7 @@ public class Server
 	 * 
 	 * @TODO: Add functionality to see Message Object to individual Client.
 	 */
-	public synchronized void broadcast(ClientHandler incomingClient, Object object)
+	protected static void broadcast(ClientHandler incomingClient, Object object)
 	{
 		for (ClientHandler outgoingClient : clients)
 		{
@@ -148,7 +152,7 @@ public class Server
 		}
 	}
 	
-	public synchronized void servercast(Object object)
+	protected static void servercast(Object object)
 	{
 		for (ClientHandler outgoingClient : clients)
 		{
@@ -156,25 +160,26 @@ public class Server
 		}
 	}
 	
-	public synchronized void unicast(ClientHandler outgoingClient, Object object)
+	protected static void unicast(ClientHandler outgoingClient, Object object, SendType type)
 	{
-		for (ClientHandler Client : clients)
+		if( type == SendType.PLAYER_INIT)
 		{
-			if (outgoingClient == Client)
+			Player player = (Player)object;	
+			player.setType(MessageType.INIT);
+			outgoingClient.send(player);
+	
+			for (ClientHandler client : clients)
 			{
-				outgoingClient.send(object);
+				Player msg = new Player(client.getPlayerName(), client.getIndex());
+				msg.setType(MessageType.PLAYER_JOIN);
+				if(client != outgoingClient)
+				{
+					outgoingClient.send(msg);
+				}
 			}
 		}
 	}
-	
-	/**
-	 * TODO: Create function that recognizes who should receive a message
-	 */
-	public synchronized void messageRouter()
-	{
 		
-	}
-	
 
 }
 
@@ -191,11 +196,10 @@ public class Server
 class ClientHandler extends Thread
 {
 	private Socket socket;					// each instance is in a different thread and has its own socket
-	private Server server;				// the main server instance
 	ObjectOutputStream out = null;
 	ObjectInputStream in = null;
-	private boolean testMode = false;
-	private String testName = "";
+	private int playerId = -1;
+	private String playerName = "";
 
 	/**
 	 * Public constructor for ClientHandler.
@@ -203,25 +207,11 @@ class ClientHandler extends Thread
 	 * @param sock:	 Newly connected client socket.
 	 * @param server Server class instance.
 	 */
-	public ClientHandler(Socket sock, Server server)
+	public ClientHandler(Socket sock)
 	{
 		this.socket = sock;
-		this.server = server;
 	}
 	
-	/**
-	 * Public constructor for ClientHandler Testing.
-	 * 
-	 * @param sock:	 Newly connected client socket.
-	 * @param server Server class instance.
-	 */
-	public ClientHandler(Socket sock, Server server, String testName)
-	{
-		this.socket = sock;
-		this.server = server;
-		this.testName = testName;
-		this.testMode = true;
-	}
 
 	/**
 	 * Override thread function responsible for monitoring socket connection for incoming Message Objects.
@@ -230,45 +220,67 @@ class ClientHandler extends Thread
 	{
 		try
 		{
-
 			// Communication channel
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(socket.getInputStream());
 
-			if(testMode)
-			{
-				System.out.println("<Server Test Mode>: Client Connected: " + testName);
-				server.unicast(this, testName);
-			}
-
 			Object object;
-			while (!socket.isClosed())
+			while (true)
 			{
 				object = in.readObject();
-			
-				server.broadcast(this, object);
+				
+				if( object instanceof Player )
+		    	{
+		    		playerInitialize(object);
+		    	}
+				else
+				{
+					//ServerMessageReceiver.receiveIncomingMessage(object);
+				}
 			}
-			
-
 		}
 		catch (IOException | ClassNotFoundException e)
 		{
 			try 
 			{
-				System.out.println("Closing socket connection.");
-				server.removeClient(this);
+				System.out.println("Closing socket connection. When");
+				Server.removeClient(this);
 				out.close();
 				in.close();
+				ServerMessageReceiver.close();
 				socket.close();
 			} 
-			catch (IOException e1) 
-			{
-			}
-			
+			catch (IOException e1) {}	
 		}
-
 	}
 	
+	private void playerInitialize(Object obj)
+	{
+		
+		if(obj instanceof Player)
+		{
+			Player player = (Player)obj;
+			if(player.getType() == MessageType.INIT)
+			{
+				setPlayerName(player.getName());
+				player.setPlayerId(playerId);
+				Server.unicast(this, player, SendType.PLAYER_INIT);
+				
+				player.setType(MessageType.PLAYER_JOIN);
+				Server.broadcast(this, player);
+			}
+		}
+	}
+	
+	public void setIndex(int index)
+	{
+		this.playerId = index;
+	}
+	
+	public int getIndex()
+	{
+		return this.playerId;
+	}
 	
 	/**
 	 * Sends a message to the client
@@ -278,7 +290,6 @@ class ClientHandler extends Thread
 	{
 		try 
 		{
-
 			out.writeObject(object);
 		} 
 		catch (IOException e) 
@@ -286,5 +297,22 @@ class ClientHandler extends Thread
 			e.printStackTrace();
 		}
 	}
+
+
+	public String getPlayerName() 
+	{
+		return playerName;
+	}
+
+
+	public void setPlayerName(String playerName) 
+	{
+		this.playerName = playerName;
+	}
 	
+}
+
+enum SendType 
+{
+		PLAYER_INIT, NORMAL;
 }

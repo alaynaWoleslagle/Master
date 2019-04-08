@@ -28,7 +28,6 @@ public class Client
 	private static ObjectInputStream in;		// from server
 	private static ObjectOutputStream out;		// to server
 	private static boolean connected = false;
-	private static MessageReceiver msgReceiver = null;
 
 
 	
@@ -39,7 +38,6 @@ public class Client
 	 */
 	public static Client getInstance()
 	{
-		
 		if( instance == null)
 		{
 			synchronized (Client.class)
@@ -83,7 +81,6 @@ public class Client
 	{
 		try
 		{
-			msgReceiver = MessageReceiver.getInstance();
 			socket = new Socket("localhost", 4242);
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(socket.getInputStream());
@@ -103,6 +100,7 @@ public class Client
 		
 		return true;
 	}
+	
 	
 
 	/**
@@ -142,7 +140,7 @@ public class Client
 				out.close();
 				in.close();		
 				socket.close();
-				msgReceiver.close();
+				ClientMessageReceiver.close();
 				System.out.println("Closing socket connection.");
 				
 			} 
@@ -174,7 +172,7 @@ public class Client
         		{
         			while (connected)
         			{
-        				msgReceiver.receiveIncomingMessage(in.readObject());
+        				ClientMessageReceiver.receiveIncomingMessage(in.readObject());
         			}
         		}
         		catch (IOException | ClassNotFoundException e)
@@ -183,11 +181,11 @@ public class Client
         			{
         				if(connected)
         				{
-                			System.out.println("Server Disconnected.");
+                			System.out.println("Server Disconnected. Why");
         					out.close();
         					in.close();
         					socket.close();
-        					msgReceiver.close();
+        					ClientMessageReceiver.close();
         					System.out.println("Closing socket connection.");
         					connected = false;
         				}
