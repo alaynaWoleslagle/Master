@@ -2,15 +2,15 @@ package utils;
 
 import java.util.ArrayList;
 
-import messages.Player;
+import messages.PlayerStatusMessage;
 import messages.BaseMessage.MessageType;
 import socket.Client;
 
 public class PlayerManager 
 {
     private static volatile PlayerManager instance = null;
-    private static volatile ArrayList<Player> playerList = null;
-    private static Player player = null;
+    private static volatile ArrayList<PlayerStatusMessage> playerList = null;
+    private static PlayerStatusMessage player = null;
 
 	
 	private PlayerManager()
@@ -24,7 +24,7 @@ public class PlayerManager
         }
         else
         {
-        	playerList = new ArrayList<Player>();
+        	playerList = new ArrayList<PlayerStatusMessage>();
         	System.out.println("Player Manager Started");
         }
 	}
@@ -54,34 +54,34 @@ public class PlayerManager
     
     public static void initializePlayer(String name)
     {
-    	Player message = new Player(name);
+    	PlayerStatusMessage message = new PlayerStatusMessage(name);
     	message.setType(MessageType.INIT);
     	System.out.println("Client Action: Initializing new Client: " + name);
     	
     	Client.send(message);
     }
     
-    public static void storeInitPlayer(Player obj)
+    public static void storeInitPlayer(PlayerStatusMessage obj)
     {
-    	if (obj instanceof Player)
+    	if (obj instanceof PlayerStatusMessage)
     	{
     		PlayerManager.player = obj;
     	}
     }
 
 
-	public static Player getPlayer() 
+	public static PlayerStatusMessage getPlayer() 
 	{
 		return player;
 	}
 	
-	public synchronized static void addPlayer(Player player)
+	public synchronized static void addPlayer(PlayerStatusMessage player)
 	{
 		playerList.add(player);
 		System.out.println("New Player: " + player);
 	}
 	
-	public synchronized static void removePlayer(Player player)
+	public synchronized static void removePlayer(PlayerStatusMessage player)
 	{
 		playerList.remove(player);
 	}

@@ -1,8 +1,7 @@
 package socket;
 
 
-import messages.ClientInitMessage;
-import messages.Player;
+import messages.PlayerStatusMessage;
 
 /**
  * 
@@ -68,11 +67,11 @@ public class ServerMessageReceiver extends MessageReceiver
      */
     public void processIncomingMessage(Object msg)
     {
-    	int playerId = -1;
-    	if( msg instanceof ClientInitMessage )
+    	//int playerId = -1;
+    	if( msg instanceof PlayerStatusMessage )
     	{
-    		ClientInitMessage initMsg = (ClientInitMessage) msg;
-    		Player player = new Player(initMsg.getName(), playerId);
+    		//Player player = (Player) msg;
+    		
         	//System.out.println("--> Receiving Object:   "+player);
     	}
     	

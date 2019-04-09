@@ -13,7 +13,7 @@ import java.io.Serializable;
  * 
  * .
  */
-public class Player extends BaseMessage implements Serializable
+public class PlayerStatusMessage extends BaseMessage implements Serializable
 {
 
 	/**
@@ -21,18 +21,18 @@ public class Player extends BaseMessage implements Serializable
 	 */
 	private static final long serialVersionUID = 5206627738168945498L;
 	
-	public Player(String name, int id)
+	public PlayerStatusMessage(String name, int id)
 	{
 		setName(name);
 		setPlayerId(id);
 	}
 	
-	public Player(String name)
+	public PlayerStatusMessage(String name)
 	{
 		setName(name);
 	}
 	
-	public Player()
+	public PlayerStatusMessage()
 	{
 		
 	}

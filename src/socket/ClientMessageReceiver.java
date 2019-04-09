@@ -1,8 +1,7 @@
 package socket;
 
 import messages.BaseMessage.MessageType;
-import messages.ClientInitMessage;
-import messages.Player;
+import messages.PlayerStatusMessage;
 import utils.PlayerManager;
 
 /**
@@ -69,9 +68,9 @@ public class ClientMessageReceiver extends MessageReceiver
      */
     public void processIncomingMessage(Object msg)
     {
-    	if( msg instanceof Player )
+    	if( msg instanceof PlayerStatusMessage )
     	{
-    		Player player = (Player) msg;
+    		PlayerStatusMessage player = (PlayerStatusMessage) msg;
     		MessageType type = player.getType();
     		
     		if(type == MessageType.INIT)

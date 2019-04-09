@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import messages.BaseMessage.MessageType;
-import messages.Player;
+import messages.PlayerStatusMessage;
 
 /**
  * 
@@ -164,13 +164,13 @@ public class Server
 	{
 		if( type == SendType.PLAYER_INIT)
 		{
-			Player player = (Player)object;	
+			PlayerStatusMessage player = (PlayerStatusMessage)object;	
 			player.setType(MessageType.INIT);
 			outgoingClient.send(player);
 	
 			for (ClientHandler client : clients)
 			{
-				Player msg = new Player(client.getPlayerName(), client.getIndex());
+				PlayerStatusMessage msg = new PlayerStatusMessage(client.getPlayerName(), client.getIndex());
 				msg.setType(MessageType.PLAYER_JOIN);
 				if(client != outgoingClient)
 				{
@@ -229,7 +229,7 @@ class ClientHandler extends Thread
 			{
 				object = in.readObject();
 				
-				if( object instanceof Player )
+				if( object instanceof PlayerStatusMessage )
 		    	{
 		    		playerInitialize(object);
 		    	}
@@ -257,9 +257,9 @@ class ClientHandler extends Thread
 	private void playerInitialize(Object obj)
 	{
 		
-		if(obj instanceof Player)
+		if(obj instanceof PlayerStatusMessage)
 		{
-			Player player = (Player)obj;
+			PlayerStatusMessage player = (PlayerStatusMessage)obj;
 			if(player.getType() == MessageType.INIT)
 			{
 				setPlayerName(player.getName());
