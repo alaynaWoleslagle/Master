@@ -2,7 +2,9 @@ package main;
 
 import java.util.Scanner;
 
-import Test.Tester;
+import logic.GameProcessor;
+import messages.BaseMessage.Action;
+import messages.PlayerStatusMessage;
 import socket.Client;
 import socket.ClientMessageReceiver;
 import socket.Server;
@@ -29,23 +31,43 @@ public class PlayerMain
 	{
 		Scanner sc = new Scanner(System.in);
 		
-		System.out.println("Start Server?");
+		System.out.println("Create Game?");
 		
 		int i = sc.nextInt();
-		
-		sc.close();
-		
+				
 		if(i == 1)
 		{
 			initializeServer();
 		}
 		
 		Client.getInstance();
-		ClientMessageReceiver.getInstance();
-		PlayerManager.getInstance();
-		Tester test = new Tester();
+		GameProcessor.getInstance();
 		
-		test.socketTest();
+		PlayerManager.initializePlayer("trae");
+		
+		System.out.println("Ready?");
+		
+		i = sc.nextInt();
+		sc.close();
+		if(i == 1)
+		{
+			PlayerStatusMessage msg = new PlayerStatusMessage();
+			msg.setPlayerId(PlayerManager.getPlayer().getPlayerId());
+			System.out.println("TRAE: " + PlayerManager.getPlayer().getPlayerId());
+
+			msg.setType(Action.START);
+			
+			PlayerManager.getPlayer().setReady(true);
+			ClientMessageReceiver.sendMessage(msg);
+			
+			System.out.println("[INFO] Sending Player Start");
+			// Do Something.
+		}
+		else
+		{
+			System.out.println("Not Ready");
+		}
+
 	}
 	
 	/**
@@ -63,16 +85,13 @@ public class PlayerMain
             @Override
         	public void run()
         	{
-            	System.out.println("Starting Server!");
-            	Server.getInstance();
             	ServerMessageReceiver.getInstance();
-           
+            	Server.getInstance();
         	}
         };
         
         //NOTE: Because this thread starts the Server, Thread priority set to MAX_PRIORITY
         Thread processThread = new Thread(listener);
-        processThread.setPriority(Thread.MAX_PRIORITY);
         processThread.setDaemon(true);
         processThread.start();
 	}

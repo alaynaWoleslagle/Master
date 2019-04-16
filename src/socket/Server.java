@@ -7,7 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import messages.BaseMessage.MessageType;
+import messages.BaseMessage.Action;
 import messages.PlayerStatusMessage;
 
 /**
@@ -23,8 +23,8 @@ import messages.PlayerStatusMessage;
 public class Server
 {
 	private static volatile Server instance = null;
-	private ServerSocket socketServer;			// for accepting connections
-	private static ArrayList<ClientHandler> clients;	// all the connections with clients
+	private volatile ServerSocket socketServer;			// for accepting connections
+	private volatile static ArrayList<ClientHandler> clients;	// all the connections with clients
 	
 
 	/**
@@ -37,14 +37,13 @@ public class Server
          */
         if (instance != null)
         {
-        	System.out.println("Exception Handled: Attempt to create new Instance using Reflection API");
+        	System.out.println("[WARNING]: Attempt to create new Instance using Reflection API");
         }
         else
         {
+        	System.out.println("[INFO]: Initializing Server...");        	
+
         	initialize();
-        	
-        	System.out.println("Message Receiver Started");
-        	
         }
 	}
 	
@@ -61,7 +60,6 @@ public class Server
                 {
                 	instance = new Server();
                 }
-                
             }
         }
 
@@ -84,6 +82,8 @@ public class Server
 		{
 			socketServer = new ServerSocket(4242);
 			clients = new ArrayList<ClientHandler>();
+        	System.out.println("[INFO]: Server Established.");        	
+
 			
 		}
 		catch (IOException e)
@@ -96,10 +96,7 @@ public class Server
 			ClientHandler client = null;
 			try
 			{
-				client = new ClientHandler(socketServer.accept());
-				client.setIndex(index);
-				client.setDaemon(true);
-				client.start();
+				client = new ClientHandler(socketServer.accept(), index);
 				addClient(client);
 				index++;
 				
@@ -152,6 +149,10 @@ public class Server
 		}
 	}
 	
+	/**
+	 * Sends message from server to all clients connected.
+	 * @param object
+	 */
 	protected static void servercast(Object object)
 	{
 		for (ClientHandler outgoingClient : clients)
@@ -160,18 +161,27 @@ public class Server
 		}
 	}
 	
+	/**
+	 * Sends loop back message to client.
+	 * @param outgoingClient 
+	 * @param object
+	 * @param type
+	 */
 	protected static void unicast(ClientHandler outgoingClient, Object object, SendType type)
 	{
 		if( type == SendType.PLAYER_INIT)
 		{
 			PlayerStatusMessage player = (PlayerStatusMessage)object;	
-			player.setType(MessageType.INIT);
+			player.setType(Action.INIT);
 			outgoingClient.send(player);
 	
 			for (ClientHandler client : clients)
 			{
-				PlayerStatusMessage msg = new PlayerStatusMessage(client.getPlayerName(), client.getIndex());
-				msg.setType(MessageType.PLAYER_JOIN);
+				PlayerStatusMessage msg = new PlayerStatusMessage();
+				msg.setName(client.getPlayerName());
+				msg.setPlayerId(client.getIndex());
+				msg.setType(Action.PLAYER_JOIN);
+				
 				if(client != outgoingClient)
 				{
 					outgoingClient.send(msg);
@@ -193,13 +203,15 @@ public class Server
  * This class is threaded to prevent blocking of the main class.
  *
  */
-class ClientHandler extends Thread
+class ClientHandler
 {
-	private Socket socket;					// each instance is in a different thread and has its own socket
-	ObjectOutputStream out = null;
-	ObjectInputStream in = null;
-	private int playerId = -1;
-	private String playerName = "";
+	private volatile Socket socket;					// each instance is in a different thread and has its own socket
+	private volatile ObjectOutputStream out = null;
+	private volatile ObjectInputStream in = null;
+	private volatile int playerId = -1;
+	private volatile boolean isInit = false;
+	private volatile String playerName = "";
+	private ServerMessageReceiver msgReceiver;
 
 	/**
 	 * Public constructor for ClientHandler.
@@ -207,80 +219,125 @@ class ClientHandler extends Thread
 	 * @param sock:	 Newly connected client socket.
 	 * @param server Server class instance.
 	 */
-	public ClientHandler(Socket sock)
+	public ClientHandler(Socket sock, int index)
 	{
 		this.socket = sock;
+		this.playerId = index;
+		this.msgReceiver = ServerMessageReceiver.getInstance();
+		run(this);
 	}
 	
 
 	/**
-	 * Override thread function responsible for monitoring socket connection for incoming Message Objects.
+	 * Returns the name of Client associated with Client Handler.
+	 * @return
 	 */
-	public void run()
+	public String getPlayerName() 
 	{
-		try
-		{
-			// Communication channel
-			out = new ObjectOutputStream(socket.getOutputStream());
-			in = new ObjectInputStream(socket.getInputStream());
+		return playerName;
+	}
 
-			Object object;
-			while (true)
-			{
-				object = in.readObject();
-				
-				if( object instanceof PlayerStatusMessage )
-		    	{
-		    		playerInitialize(object);
-		    	}
-				else
-				{
-					//ServerMessageReceiver.receiveIncomingMessage(object);
-				}
-			}
-		}
-		catch (IOException | ClassNotFoundException e)
-		{
-			try 
-			{
-				System.out.println("Closing socket connection. When");
-				Server.removeClient(this);
-				out.close();
-				in.close();
-				ServerMessageReceiver.close();
-				socket.close();
-			} 
-			catch (IOException e1) {}	
-		}
-	}
 	
-	private void playerInitialize(Object obj)
-	{
-		
-		if(obj instanceof PlayerStatusMessage)
-		{
-			PlayerStatusMessage player = (PlayerStatusMessage)obj;
-			if(player.getType() == MessageType.INIT)
-			{
-				setPlayerName(player.getName());
-				player.setPlayerId(playerId);
-				Server.unicast(this, player, SendType.PLAYER_INIT);
-				
-				player.setType(MessageType.PLAYER_JOIN);
-				Server.broadcast(this, player);
-			}
-		}
-	}
-	
-	public void setIndex(int index)
-	{
-		this.playerId = index;
-	}
-	
+	/**
+	 * Returns the index of the Client associated with Client Handler.
+	 */
 	public int getIndex()
 	{
 		return this.playerId;
 	}
+
+	/**
+	 * Override thread function responsible for monitoring socket connection for incoming Message Objects.
+	 */
+	public void run(ClientHandler handler)
+	{
+		Runnable listener = new Runnable()
+    	{
+            @Override
+        	public void run()
+        	{
+            	try
+        		{
+        			out = new ObjectOutputStream(socket.getOutputStream());
+        			in = new ObjectInputStream(socket.getInputStream());
+
+        			Object object;
+        			while (true)
+        			{
+        				object = in.readObject();
+        				
+        				if(object instanceof PlayerStatusMessage )
+        		    	{
+        					PlayerStatusMessage msg = (PlayerStatusMessage) object;
+            				System.out.println("Made it 1");
+
+        					if(isInit == false && msg.getType() == Action.INIT)
+        					{
+                				System.out.println("Made it 2");
+        						playerInitialize(msg);
+        					}
+        					else if(msg.getType() == Action.START)
+        		    		{
+                				System.out.println("Made it 3");
+        		    			msgReceiver.updatePlayerStartStatus(playerId);
+        		    		}
+            				else
+            				{
+                				System.out.println("Made it 4");
+                				//msgReceiver.processIncomingMessage(object);
+            				}
+        					
+        		    	}
+
+        			}
+        		}
+        		catch (IOException | ClassNotFoundException e)
+        		{
+       			 	e.printStackTrace();
+
+        			try 
+        			{
+        				System.out.println("[INFO]: Closing Server Connection...");
+        				Server.removeClient(handler);
+        				out.close();
+        				in.close();
+        				msgReceiver.close();
+        				socket.close();
+        			} 
+        			catch (IOException e1) 
+        			{
+	        			 e1.printStackTrace();
+        			}	
+        		}
+        	}
+        };
+        Thread clientListener = new Thread(listener);
+        clientListener.setDaemon(true);
+        clientListener.start();
+		
+	}
+	
+	/**
+	 * Sends Player initialization messages to other players and server.
+	 * @param player
+	 */
+	private void playerInitialize(PlayerStatusMessage player)
+	{
+		this.playerName = player.getName();
+		player.setPlayerId(playerId);
+		
+		// Update Server
+		ServerMessageReceiver.addPlayer(player);
+		
+		// Update New Player
+		Server.unicast(this, player, SendType.PLAYER_INIT);
+				
+		// Update Other Players
+		player.setType(Action.PLAYER_JOIN);
+		Server.broadcast(this, player);
+	}
+	
+
 	
 	/**
 	 * Sends a message to the client
@@ -298,17 +355,6 @@ class ClientHandler extends Thread
 		}
 	}
 
-
-	public String getPlayerName() 
-	{
-		return playerName;
-	}
-
-
-	public void setPlayerName(String playerName) 
-	{
-		this.playerName = playerName;
-	}
 	
 }
 

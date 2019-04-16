@@ -2,7 +2,7 @@ package messages;
 
 import java.io.Serializable;
 
-public class BaseMessage implements Serializable
+public abstract class BaseMessage implements Serializable
 {
 	/**
 	 * This Abstract class is the Base class for which all message objects extend from.
@@ -25,15 +25,20 @@ public class BaseMessage implements Serializable
 	 */
 	public enum MessageType 
 	{ 
-	    INIT, PLAYER_JOIN; 
+
 	} 
+	
+	public enum Action
+	{
+		INIT, PLAYER_JOIN, START;
+	}
 	
 	/**
 	 * type: Message Type
 	 *       Message Type SHALL be set by the Client who is sending the Message.
 	 *       
 	 */
-	private MessageType type = MessageType.INIT;
+	private Action type = Action.INIT;
 	
 	/**
 	 *  name: Player Name
@@ -73,7 +78,7 @@ public class BaseMessage implements Serializable
 	 * Gets Message Type.
 	 * @return Message Type
 	 */
-	public MessageType getType() 
+	public Action getType() 
 	{
 		return type;
 	}
@@ -82,7 +87,7 @@ public class BaseMessage implements Serializable
 	 * Sets Message Type.
 	 * @param type: Message Type
 	 */
-	public void setType(MessageType type) 
+	public void setType(Action type) 
 	{
 		this.type = type;
 	}

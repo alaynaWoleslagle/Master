@@ -5,6 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import utils.PlayerManager;
+
 
 /**
  * 
@@ -28,6 +30,7 @@ public class Client
 	private static ObjectInputStream in;		// from server
 	private static ObjectOutputStream out;		// to server
 	private static boolean connected = false;
+	private static ClientMessageReceiver msgReceiver = null;
 
 
 	
@@ -61,13 +64,15 @@ public class Client
          */
 		if (instance != null)
 		{
-        	System.out.println("Exception Handled: Attempt to create new Instance using Reflection API");
+        	System.out.println("[WARNING]: Attempt to create new Instance using Reflection API");
 		}
 		else
 		{
+        	System.out.println("[INFO]: Initializing Client Connection...");        	
+
 			if(initialize())
 			{
-        		System.out.println("Client Socket Started");
+	        	System.out.println("[INFO]: Client Connection Established.");        	
 			}
 		}
 	}
@@ -81,15 +86,12 @@ public class Client
 	{
 		try
 		{
+			PlayerManager.getInstance();
+			msgReceiver = ClientMessageReceiver.getInstance();
 			socket = new Socket("localhost", 4242);
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(socket.getInputStream());
 		    connected = true;
-		    
-		    if(connected == true)
-		    {
-		    	System.out.println("Client Connected.");
-		    }
 
 			listenerThread();
 		}
@@ -108,7 +110,7 @@ public class Client
 	 * @param msg Message Object to be sent to the server/clients.
 	 * @return sent Boolean value whether message was sent or not
 	 */
-	public static boolean send(Object msg)
+	protected static boolean send(Object msg)
 	{
 		boolean sent = false;
 		try
@@ -136,12 +138,11 @@ public class Client
 		{
 			try 
 			{
-				System.out.println("Client Disconnected.");
+	        	System.out.println("[INFO] Client Disconnected...");        	
 				out.close();
 				in.close();		
 				socket.close();
-				ClientMessageReceiver.close();
-				System.out.println("Closing socket connection.");
+				msgReceiver.close();
 				
 			} 
 			catch (IOException e) 
@@ -172,7 +173,7 @@ public class Client
         		{
         			while (connected)
         			{
-        				ClientMessageReceiver.receiveIncomingMessage(in.readObject());
+        				msgReceiver.receiveIncomingMessage(in.readObject());
         			}
         		}
         		catch (IOException | ClassNotFoundException e)
@@ -181,12 +182,11 @@ public class Client
         			{
         				if(connected)
         				{
-                			System.out.println("Server Disconnected. Why");
+        		        	System.out.println("[INFO] Server Disconnected...");        	
         					out.close();
         					in.close();
         					socket.close();
-        					ClientMessageReceiver.close();
-        					System.out.println("Closing socket connection.");
+        					msgReceiver.close();
         					connected = false;
         				}
         			} 

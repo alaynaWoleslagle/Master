@@ -3,16 +3,25 @@ package utils;
 import java.util.ArrayList;
 
 import messages.PlayerStatusMessage;
-import messages.BaseMessage.MessageType;
-import socket.Client;
+import messages.BaseMessage.Action;
+import socket.ClientMessageReceiver;
 
+/**
+ * This class is responsible to maintaining the status and information of each player in the game.
+ * Notable objects in the class include an ArrayList
+ * @author Trae
+ * @version 1.0 4/10/19
+ */
 public class PlayerManager 
 {
     private static volatile PlayerManager instance = null;
-    private static volatile ArrayList<PlayerStatusMessage> playerList = null;
-    private static PlayerStatusMessage player = null;
+    private static volatile ArrayList<Player> playerList = null;
+    private static volatile Player player = null;
 
 	
+    /**
+     * Private PlayerManager constructor.
+     */
 	private PlayerManager()
 	{
         /**
@@ -24,12 +33,17 @@ public class PlayerManager
         }
         else
         {
-        	playerList = new ArrayList<PlayerStatusMessage>();
-        	System.out.println("Player Manager Started");
+        	playerList = new ArrayList<Player>();
+        	player = new Player();
+        	System.out.println("[INFO]: Player Manager Initialized.");
         }
 	}
 	
 
+	/**
+	 * Returns the singleton instance of PlayerManager class.
+	 * @return PlayerManager instance.
+	 */
     public static PlayerManager getInstance() 
     {
         if (instance == null) 
@@ -50,38 +64,53 @@ public class PlayerManager
         return instance;
     }
     
-	
-    
+	/**
+	 * Initializes the player object.
+	 * This function sends a notification message to the server and will in return
+	 * receive a unique player ID.
+	 * @param name Name of player.
+	 */
     public static void initializePlayer(String name)
     {
-    	PlayerStatusMessage message = new PlayerStatusMessage(name);
-    	message.setType(MessageType.INIT);
+    	PlayerStatusMessage message = new PlayerStatusMessage();
+    	message.setName(name);
+    	message.setType(Action.INIT);
     	System.out.println("Client Action: Initializing new Client: " + name);
     	
-    	Client.send(message);
+    	ClientMessageReceiver.sendMessage(message);
     }
     
-    public static void storeInitPlayer(PlayerStatusMessage obj)
+    /**
+     * Sets the Player Object.
+     * This function is called when the server sends back a message containing the players unique ID.
+     * @param obj Player Object received by server.
+     */
+    public static void storInitPlayer(Player obj)
     {
-    	if (obj instanceof PlayerStatusMessage)
+    	if (obj instanceof Player)
     	{
     		PlayerManager.player = obj;
     	}
     }
 
 
-	public static PlayerStatusMessage getPlayer() 
+	public static Player getPlayer() 
 	{
 		return player;
 	}
 	
-	public synchronized static void addPlayer(PlayerStatusMessage player)
+	public static void setPlayer(Player obj)
+	{
+		player = obj;
+	}
+	
+	public synchronized static void addNewPlayer(Player player)
 	{
 		playerList.add(player);
 		System.out.println("New Player: " + player);
 	}
 	
-	public synchronized static void removePlayer(PlayerStatusMessage player)
+	public synchronized static void removePlayer(Player player)
 	{
 		playerList.remove(player);
 	}

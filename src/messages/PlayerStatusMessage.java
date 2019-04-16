@@ -21,16 +21,6 @@ public class PlayerStatusMessage extends BaseMessage implements Serializable
 	 */
 	private static final long serialVersionUID = 5206627738168945498L;
 	
-	public PlayerStatusMessage(String name, int id)
-	{
-		setName(name);
-		setPlayerId(id);
-	}
-	
-	public PlayerStatusMessage(String name)
-	{
-		setName(name);
-	}
 	
 	public PlayerStatusMessage()
 	{

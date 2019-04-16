@@ -23,7 +23,6 @@ public class Tester
 		//int id = r.nextInt((100 - 1) + 1) + 1;
 
 	    //Student student = new Student(id, "TEST");
-		System.out.println("Made it 1");
 		PlayerManager.initializePlayer("trae");
 
 		

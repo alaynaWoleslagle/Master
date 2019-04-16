@@ -6,9 +6,9 @@ import java.util.Queue;
 public abstract class MessageReceiver 
 {
 	
-    protected static Queue<Object> queue = null;
-    protected static boolean running = false;
-    protected Thread processThread;
+    protected static volatile Queue<Object> queue = null;
+    protected static volatile boolean running = false;
+    protected volatile Thread processThread;
 
     
     
@@ -24,17 +24,17 @@ public abstract class MessageReceiver
     {
     	queue = new LinkedList<Object>();
     	running = true;
-    	processThread();
     	
     	return true;
     }
     
     /**
+     * This function clears out Message Queue and 
+     *
      * @author Trae
      * 
-     * This function clears out Message Queue and 
      */
-    public static void close()
+    public void close()
     {
     	/**
     	 * Setting Running flag to false exits loop for threaded process functions.
@@ -44,16 +44,19 @@ public abstract class MessageReceiver
     	queue.clear();
     }
     
+    
     /**
      * @author Trae
      * 
      * Receives message from Client Socket and adds it to Message Queue to be processed.
+     * @param  
      * 
      * @param msg: Message to be added to Message Queue.
      */
-    protected synchronized static void receiveIncomingMessage(Object msg)
+    protected synchronized void receiveIncomingMessage(Object msg)
     {
     	queue.add(msg);
+    	System.out.println("Queue Size: " + queue.size());
     }
     
     /**
@@ -68,47 +71,11 @@ public abstract class MessageReceiver
     	return queue.poll();
     }
     
-	protected void processThread()
-	{
 
-    	Runnable listener = new Runnable()
-    	{
-            @Override
-        	public void run()
-        	{
-            	while(running)
-            	{
-         		   try 
-        		   {
-        			   Thread.sleep(10);
-        		   } 
-        		   catch (InterruptedException e) 
-        		   {
-        			   // TODO Auto-generated catch block
-        			   e.printStackTrace();
-        		   }
-            		if(queue.size() > 0)
-            		{
-            			Object tmp = pop();
-            			if(tmp != null)
-            			{
-            				processIncomingMessage(tmp);
-            			}
-            			else
-            			{
-            				System.out.println("Exception Handled: Received NULL Message");
-            			}
-            		}
-            	}
-            	
-        	}
-        };
-        processThread = new Thread(listener);
-        processThread.setPriority(1);
-        processThread.setDaemon(true);
-        processThread.start();
-	}
-
+    /**
+     * Abstract function for processing incoming messages.
+     * @param tmp Object being received from the socket.
+     */
 	protected abstract void processIncomingMessage(Object tmp);
     
 }

@@ -1,20 +1,18 @@
 package socket;
 
-import messages.BaseMessage.MessageType;
-import messages.PlayerStatusMessage;
-import utils.PlayerManager;
+import logic.GameProcessor;
+
 
 /**
- * 
- * @author Trae
  *
- * @version 2.0 (4/4/2019)
- * 
- * Singleton Class
  * This class is responsible for receiving Messages from the Queue.
  * Messages are added to a Queue which is will then be processed on a separate thread.
  * 
  * This class acts as an interface between the Client socket and main Game logic through the receipt of messages.
+ * @author Trae
+ * 
+ * @version 2.1 
+ *
  */
 public class ClientMessageReceiver extends MessageReceiver
 {
@@ -33,11 +31,16 @@ public class ClientMessageReceiver extends MessageReceiver
         {
         	if(initialize())
         	{
-        		System.out.println("Client Message Receiver Started");
+        		System.out.println("[INFO]: Client Message Receiver Initialized.");
+        		process();
         	}
         }
 	}
 	
+	/**
+	 * Returns the Singleton instance of ClientMessageReceiver class
+	 * @return ClientMessageReceiver
+	 */
     public static ClientMessageReceiver getInstance() 
     {
         if (msgReceiver == null) 
@@ -58,7 +61,64 @@ public class ClientMessageReceiver extends MessageReceiver
         return msgReceiver;
     }
     
+    
+    /**
+     * process 
+     */
+	protected void process()
+	{
 
+    	Runnable listener = new Runnable()
+    	{
+            @Override
+        	public void run()
+        	{
+            	while(running)
+            	{
+            		try 
+         		   	{
+            			Thread.sleep(10);
+         		   	} 
+         		   	catch (InterruptedException e) 
+         		   	{
+         		   		// TODO Auto-generated catch block
+         		   		e.printStackTrace();
+         		   	}
+            		if(!queue.isEmpty())
+            		{
+
+            			Object tmp = pop();
+            			if(tmp != null)
+            			{
+            				processIncomingMessage(tmp);
+            			}
+            			else
+            			{
+            				System.out.println("Exception Handled: Received NULL Message");
+            			}
+            		}
+            		else
+            		{
+        				//System.out.println("Queue Empty");
+            		}
+            		
+            	}
+            	
+        	}
+        };
+        processThread = new Thread(listener);
+        processThread.setDaemon(true);
+        processThread.start();
+	}
+
+    /**
+     * Sends message object to the server.
+     * @param msg
+     */
+    public static void sendMessage(Object msg)
+    {
+    	Client.send(msg);
+    }
    
     
     /**
@@ -66,23 +126,9 @@ public class ClientMessageReceiver extends MessageReceiver
      * TODO: Game logic function should be called here. Function that receives Message and processes it.
      * @param msg
      */
-    public void processIncomingMessage(Object msg)
+    protected synchronized void processIncomingMessage(Object msg)
     {
-    	if( msg instanceof PlayerStatusMessage )
-    	{
-    		PlayerStatusMessage player = (PlayerStatusMessage) msg;
-    		MessageType type = player.getType();
-    		
-    		if(type == MessageType.INIT)
-    		{
-        		PlayerManager.storeInitPlayer(player);
-    		}
-    		else if(type == MessageType.PLAYER_JOIN)
-    		{
-        		PlayerManager.addPlayer(player);
-    		}
-        	//System.out.println("--> Receiving Object:   "+player);
-    	}
+    	GameProcessor.processMessage(msg);
     }
     
     
