@@ -26,8 +26,18 @@ public class UserInterface extends Application{
 //		gameScreen.setUi(this);
 //		Scene gameScene = gameScreen.createScene();
 		
+		
+//		String[] names = {"player1", "player2"};
+//		LobbyScreen lobby = new LobbyScreen(2, names);
+//		Scene lobbyScene = lobby.createLobby();
+//		lobby.addPlayer("EMMA");
+		
+		StartScreen start = new StartScreen();
+		Scene startScene = start.createStartScene();
+		
 		Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
+		setScene(startScene);
 //		setScene(gameScene);
 		
 		stage.setX(primaryScreenBounds.getMinX());
@@ -47,5 +57,4 @@ public class UserInterface extends Application{
 		stage.setHeight(scene.getHeight());
 		stage.show();
 	}
-
 }
