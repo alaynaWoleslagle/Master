@@ -387,7 +387,8 @@ public class GameScreen {
 		btn13.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				ui.setScene(ui.createStartScreen());
+				StartScreen startScreen = new StartScreen(ui);
+				ui.setScene(startScreen.createStartScene());
 			}
 		});
 		VBox tempControlsBox = new VBox(btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btn10, btn11, btn12, btn13);

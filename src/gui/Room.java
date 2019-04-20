@@ -59,10 +59,12 @@ public class Room extends StackPane {
 	}
 
 	public void removeOccupant(String occupyingPlayer) {
-		Occupant occupant = occupantMap.get(occupyingPlayer);
-		getChildren().remove(occupant.circle);
-		occupiedSpaces[occupant.occupyingSpace] = false;
-		occupantMap.remove(occupyingPlayer);
+		if (occupantMap.containsKey(occupyingPlayer)) {
+			Occupant occupant = occupantMap.get(occupyingPlayer);
+			getChildren().remove(occupant.circle);
+			occupiedSpaces[occupant.occupyingSpace] = false;
+			occupantMap.remove(occupyingPlayer);
+		}
 	}
 	
 	public void setName(String roomName) {

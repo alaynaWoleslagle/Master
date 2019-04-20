@@ -17,44 +17,40 @@ public class UserInterface extends Application{
 	@Override
 	public void start(Stage stage) throws Exception {
 		this.stage = stage;
-		
-		// call this after character selection
+
+		Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+
+		stage.setX(primaryScreenBounds.getMinX());
+		stage.setY(primaryScreenBounds.getMinY());
+
+		//example start screen setup
+		StartScreen start = new StartScreen(this);
+		Scene startScene = start.createStartScene();
+		setScene(startScene);
+
+		//example lobby screen setup
+//		String[] names = {"player1", "player2"};
+//		LobbyScreen lobby = new LobbyScreen(2, names);
+//		Scene lobbyScene = lobby.createLobby();
+//		lobby.addPlayer("EMMA");
+//		setScene(lobbyScene);
+
+		//example game screen setup
 //		String[] players = {"1", "2", "3", "4"};
 //		String[] cards = {"rope", "plum", "billiard room", "pipe"};
 //		int assignedTurnIndex = 2;
 //		GameScreen gameScreen = new GameScreen(players, cards, assignedTurnIndex);
 //		gameScreen.setUi(this);
 //		Scene gameScene = gameScreen.createScene();
-		
-		
-//		String[] names = {"player1", "player2"};
-//		LobbyScreen lobby = new LobbyScreen(2, names);
-//		Scene lobbyScene = lobby.createLobby();
-//		lobby.addPlayer("EMMA");
-		
-		StartScreen start = new StartScreen();
-		Scene startScene = start.createStartScene();
-		
-		Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
-
-		setScene(startScene);
 //		setScene(gameScene);
-		
-		stage.setX(primaryScreenBounds.getMinX());
-		stage.setY(primaryScreenBounds.getMinY());
-		stage.setWidth(primaryScreenBounds.getWidth() * .8);
-		stage.setHeight(primaryScreenBounds.getHeight());
 
-		
-		stage.show();
-		
-		
 	}
 
 	public void setScene(Scene scene) {
-		stage.setScene(scene);
+		//order is important: width and height must be set before scene is set
 		stage.setWidth(scene.getWidth());
 		stage.setHeight(scene.getHeight());
+		stage.setScene(scene);
 		stage.show();
 	}
 }

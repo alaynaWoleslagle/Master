@@ -54,7 +54,8 @@ public class ConnectionScreen {
 
         EventHandler<ActionEvent> continueClicked = new EventHandler<ActionEvent>() { 
             public void handle(ActionEvent e) 
-            { 
+            {
+            	//TODO: move logic to GameProcessor?
             	// For testing only, ignore this
 //                existingGameIdOk = validateExistingGameId(gameIdField.getText());
 //                newGameIdOk = validateNewGameId(gameIdField.getText());
@@ -98,7 +99,7 @@ public class ConnectionScreen {
         continueButton.setOnAction(continueClicked);
         
         root.getChildren().addAll(gameIdText, gameIdField, playerNameField, playerNameText, continueButton);
-        Scene connectionScene = new Scene(root, 0, 0);
+        Scene connectionScene = new Scene(root, 700, 900);
         
         return connectionScene;
 	}

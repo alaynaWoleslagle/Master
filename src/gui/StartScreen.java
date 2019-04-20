@@ -10,11 +10,12 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 public class StartScreen {
-    
-	
-	public StartScreen()
-	{
 
+	private UserInterface ui;
+	
+	public StartScreen(UserInterface ui)
+	{
+		this.ui = ui;
 	}
 	
 	public Scene createStartScene() {
@@ -32,26 +33,26 @@ public class StartScreen {
         joinButton.setTranslateY(welcomeText.getTranslateY() + 100);
         startButton.setTranslateY(welcomeText.getTranslateY() + 150);
         
-        ConnectionScreen connectionScreen = new ConnectionScreen();
-        
         EventHandler<ActionEvent> joinGameClicked = new EventHandler<ActionEvent>() { 
             public void handle(ActionEvent e) 
-            { 
-            		connectionScreen.createScene("join");
+            {
+				ConnectionScreen connectionScreen = new ConnectionScreen();
+            	ui.setScene(connectionScreen.createScene("join"));
             } 
         }; 
         
         EventHandler<ActionEvent> startNewGameClicked = new EventHandler<ActionEvent>() { 
             public void handle(ActionEvent e) 
-            { 
-            		connectionScreen.createScene("new");
-            } 
+            {
+				ConnectionScreen connectionScreen = new ConnectionScreen();
+				ui.setScene(connectionScreen.createScene("new"));
+            }
         }; 
   
         joinButton.setOnAction(joinGameClicked); 
         startButton.setOnAction(startNewGameClicked);
         
-		Scene startScene = new Scene(root, 0, 0);
+		Scene startScene = new Scene(root, 700, 900);
 		
 		return startScene;
 	}

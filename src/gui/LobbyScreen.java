@@ -62,8 +62,7 @@ public class LobbyScreen {
 		playerChoiceSpot currentPlayerSpot = playerChoiceSpots[assignedPlayerIndex];
 		for (Rectangle character : characterChoices)
 		{
-			character.setOnMouseClicked(new EventHandler<MouseEvent>()
-	        {
+			character.setOnMouseClicked(new EventHandler<MouseEvent>() {
 	            @Override
 	            public void handle(MouseEvent t) {
 	            		Color charColor = (Color) character.getFill();
@@ -102,7 +101,7 @@ public class LobbyScreen {
 		playerNamesGroup.setTranslateY(450);
 		
 		root.getChildren().addAll(playerGroup, characterGroup, playerNamesGroup);
-		return new Scene(root);
+		return new Scene(root, 1000, 800);
 	}
 	
 	public void disableReady()
