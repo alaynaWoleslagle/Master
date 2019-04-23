@@ -131,5 +131,11 @@ public class LobbyScreen {
 		playerNamesGroup.setTranslateY(450);
 		root.getChildren().add(playerNamesGroup);
 	}
+	
+	public void updatePlayerColor(String playerName, Color choice)
+	{
+		int index = allPlayerNames.indexOf(playerName);
+		playerChoiceSpots[index].setColor(choice);
+	}
 
 }
