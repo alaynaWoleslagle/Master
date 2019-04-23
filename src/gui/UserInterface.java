@@ -44,6 +44,10 @@ public class UserInterface extends Application{
 //		Scene gameScene = gameScreen.createScene();
 //		setScene(gameScene);
 
+		//example suggestion/accusation screen setup
+//		SuggestAccuseScreen suggestAccuseScreen = new SuggestAccuseScreen("Study");
+//		Scene suggestAccuseScene = suggestAccuseScreen.createScene();
+//		setScene(suggestAccuseScene);
 	}
 
 	public void setScene(Scene scene) {
