@@ -28,10 +28,22 @@ public class SuggestAccuseScreen {
 
 	private Map<String, Rectangle> characterRectMap = new HashMap<>();
 	private Map<String, Rectangle> weaponRectMap = new HashMap<>();
+	private Map<String, Rectangle> roomRectMap = new HashMap<>();
+
+	private boolean isMakingSuggestion;
+
+	private static final Color SELECTED_COLOR = Color.GOLD;
+	private static final Color UNSELECTED_COLOR = Color.WHITE;
+	private static final Color DISABLED_COLOR = Color.GRAY;
 
 	public SuggestAccuseScreen(String currentRoom)
 	{
 		selectedRoom = currentRoom;
+		this.isMakingSuggestion = true;
+	}
+	public SuggestAccuseScreen()
+	{
+		this.isMakingSuggestion = false;
 	}
 	
 	public Scene createScene() {
@@ -39,7 +51,7 @@ public class SuggestAccuseScreen {
 		HBox charactersBox = new HBox();
 		for (String character : characters) {
 			Rectangle rect = new Rectangle(100, 175);
-			rect.setFill(Color.WHITE);
+			rect.setFill(UNSELECTED_COLOR);
 			rect.setStroke(Color.BLACK);
 			Text text = new Text(character);
 			StackPane characterSelect = new StackPane(rect, text);
@@ -55,7 +67,7 @@ public class SuggestAccuseScreen {
 		HBox weaponsBox = new HBox();
 		for (String weapon : weapons) {
 			Rectangle rect = new Rectangle(100, 175);
-			rect.setFill(Color.WHITE);
+			rect.setFill(UNSELECTED_COLOR);
 			rect.setStroke(Color.BLACK);
 			Text text = new Text(weapon);
 			StackPane weaponSelect = new StackPane(rect, text);
@@ -71,15 +83,27 @@ public class SuggestAccuseScreen {
 		HBox roomsBox = new HBox();
 		for (String room : rooms) {
 			Rectangle rect = new Rectangle(100, 175);
-			if (room.equals(selectedRoom)) {
-				rect.setFill(Color.GOLD);
-			}
-			else {
-				rect.setFill(Color.GRAY);
-			}
 			rect.setStroke(Color.BLACK);
 			Text text = new Text(room);
 			StackPane roomSelect = new StackPane(rect, text);
+			roomRectMap.put(room, rect);
+			if (isMakingSuggestion) {
+				if (room.equals(selectedRoom)) {
+					rect.setFill(SELECTED_COLOR);
+				}
+				else {
+					rect.setFill(DISABLED_COLOR);
+				}
+			}
+			else {
+				rect.setFill(UNSELECTED_COLOR);
+				roomSelect.setOnMouseClicked(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent event) {
+						setSelectedRoom(room);
+					}
+				});
+			}
 			roomsBox.getChildren().add(roomSelect);
 		}
 		VBox rows = new VBox(20, charactersBox, weaponsBox, roomsBox);
@@ -114,9 +138,9 @@ public class SuggestAccuseScreen {
 
 	public void setSelectedCharacter(String selectedCharacter) {
 		if (this.selectedCharacter != null) {
-			characterRectMap.get(this.selectedCharacter).setFill(Color.WHITE);
+			characterRectMap.get(this.selectedCharacter).setFill(UNSELECTED_COLOR);
 		}
-		characterRectMap.get(selectedCharacter).setFill(Color.GOLD);
+		characterRectMap.get(selectedCharacter).setFill(SELECTED_COLOR);
 		this.selectedCharacter = selectedCharacter;
 
 	}
@@ -126,15 +150,22 @@ public class SuggestAccuseScreen {
 
 	public void setSelectedWeapon(String selectedWeapon) {
 		if (this.selectedWeapon != null) {
-			weaponRectMap.get(this.selectedWeapon).setFill(Color.WHITE);
+			weaponRectMap.get(this.selectedWeapon).setFill(UNSELECTED_COLOR);
 		}
-		weaponRectMap.get(selectedWeapon).setFill(Color.GOLD);
+		weaponRectMap.get(selectedWeapon).setFill(SELECTED_COLOR);
 		this.selectedWeapon = selectedWeapon;
 	}
 	public String getSelectedWeapon() {
 		return selectedWeapon;
 	}
 
+	public void setSelectedRoom(String selectedRoom) {
+		if (this.selectedRoom != null) {
+			roomRectMap.get(this.selectedRoom).setFill(UNSELECTED_COLOR);
+		}
+		roomRectMap.get(selectedRoom).setFill(SELECTED_COLOR);
+		this.selectedRoom = selectedRoom;
+	}
 	public String getSelectedRoom() {
 		return selectedRoom;
 	}
