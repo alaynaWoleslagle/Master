@@ -30,7 +30,7 @@ public abstract class BaseMessage implements Serializable
 	
 	public enum Action
 	{
-		INIT, PLAYER_JOIN, START;
+		INIT, PLAYER_JOIN, START, TURN;
 	}
 	
 	/**

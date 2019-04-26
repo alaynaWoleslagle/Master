@@ -13,6 +13,8 @@ public class Player
 
 	/** name: Name of player */
 	private volatile String name;
+
+    private volatile int [] position;
 	
 	/** playerId: Unique id associated with player */
 	private volatile int playerId;
@@ -24,10 +26,11 @@ public class Player
 	 * @param name: Name of player
 	 * @param id:	Unique id of player
 	 */
-	public Player(String name, int id)
+	public Player(String name, int id, int[] position)
 	{
 		setName(name);
 		setPlayerId(id);
+		setPosition(position);
 	}
 	
 	/**
@@ -63,6 +66,18 @@ public class Player
 	{
 		this.name = name;
 	}
+
+    /**
+     * Returns the position of the player
+     * @param position
+     */
+    public int[] getPosition() { return position; }
+
+    /**
+     * Sets the position of the player
+     * @param position
+     */
+    public synchronized void setPosition(int[] position) { this.position = position; }
 
 	/**
 	 * Returns the unique player Id for player.
