@@ -1,7 +1,7 @@
 package gui;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import controller.ViewController;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -9,26 +9,70 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import utils.Player;
 
-public class LobbyScreen {
-	
+public class LobbyScreen 
+{
+	private ArrayList<Player> players = new ArrayList<Player>();
     private Button readyButton;
     private int assignedPlayerIndex;
     private Group root = new Group();
     
-    playerChoiceSpot[] playerChoiceSpots = new playerChoiceSpot[6];
+    /** StackPanes Array */
+    StackPane[] stackPanes = new StackPane[6];
+
+    /** PlayerChoiceSpot Array */
+    PlayerChoiceSpot[] playerChoiceSpots = new PlayerChoiceSpot[6];
+    
+    /** Rectangle Array */
     Rectangle[] characterChoices = new Rectangle[6];
+    
     ArrayList<String> allPlayerNames;
     
-    public LobbyScreen(int assignedPlayerIndex, String[] allPlayerNames) {
-    		this.assignedPlayerIndex = assignedPlayerIndex;
-    		this.allPlayerNames = new ArrayList<>(Arrays.asList(allPlayerNames));
+	/**
+	* LobbyScreen Test Constructor.
+	* For testing purposes 
+	*/
+    public LobbyScreen(int assignedPlayerIndex, String[] allPlayerNames) 
+    {
+		this.allPlayerNames = new ArrayList<>(Arrays.asList(allPlayerNames));
+    }
+    
+    /**
+     * LobbyScreen Constructor.
+     * @param assignedPlayerIndex
+     * @param name
+     */
+    public LobbyScreen(int assignedPlayerIndex, String name)
+    {
+		this.assignedPlayerIndex = assignedPlayerIndex;
+    	initializeArray();
+    	this.allPlayerNames.set(assignedPlayerIndex, name);
+    }
+    
+    /**
+     * Initialize Player names Array.
+     * Every entry in 'allPlayerNames' ArrayList should contain empty string
+     * This is done because ArrayLists don't allow for entry at specific indexes if there are null indexes.
+     */
+    private void initializeArray()
+    {
+    	allPlayerNames = new ArrayList<String>();
+    	for(int i = 0; i < 6; i++)
+    	{
+    		allPlayerNames.add("");
+    	}
     }
 	
-	public Scene createLobby()
+    /**
+     * Creates Lobby screen scene
+     * @return
+     */
+	public Scene createScene()
 	{
 		// set up player choice spots
 		Group playerGroup = new Group();
@@ -37,10 +81,14 @@ public class LobbyScreen {
 		int y = 480;
 		for (int i = 0; i < playerChoiceSpots.length; ++i)
 		{
-			playerChoiceSpots[i] = new playerChoiceSpot(x,y);
+			
+			playerChoiceSpots[i] = new PlayerChoiceSpot(x,y);
 			playerChoiceSpots[i].setFill(Color.GRAY);
 			playerChoiceSpots[i].setStroke(Color.BLACK);
-			playerHbox.getChildren().add(playerChoiceSpots[i]);
+			Text text = new Text(allPlayerNames.get(i));
+			stackPanes[i] = new StackPane();
+			stackPanes[i].getChildren().addAll(playerChoiceSpots[i], text);
+			playerHbox.getChildren().add(stackPanes[i]);
 		}
 		playerGroup.getChildren().add(playerHbox);
 		playerGroup.setTranslateY(500);
@@ -59,14 +107,17 @@ public class LobbyScreen {
 		characterGroup.getChildren().add(characterHbox);
 		
 		// When player clicks color, update their choice box
-		playerChoiceSpot currentPlayerSpot = playerChoiceSpots[assignedPlayerIndex];
+		PlayerChoiceSpot currentPlayerSpot = playerChoiceSpots[assignedPlayerIndex];
 		for (Rectangle character : characterChoices)
 		{
-			character.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			character.setOnMouseClicked(new EventHandler<MouseEvent>() 
+			{
 	            @Override
-	            public void handle(MouseEvent t) {
-	            		Color charColor = (Color) character.getFill();
-	               currentPlayerSpot.setColor(charColor);
+	            public void handle(MouseEvent t) 
+	            {
+	            	Color charColor = (Color) character.getFill();
+	            	currentPlayerSpot.setColor(charColor);
+	            	ViewController.registerCharacterSelection(assignedPlayerIndex, colorConverter(charColor));
 	            }
 	        });
 		}
@@ -87,55 +138,121 @@ public class LobbyScreen {
         
         readyButton.setOnAction(readyClicked);
 		
-        // Player Names
-        HBox playerNamesHbox = new HBox(120);
-        Group playerNamesGroup = new Group();
-		for (int i = 0; i < allPlayerNames.size(); ++i)
-		{
-			playerChoiceSpot currentSpot = playerChoiceSpots[i];
-			Text playerName = new Text(allPlayerNames.get(i));
-			playerName.setLayoutY(currentSpot.getLayoutY() - 50);
-			playerNamesHbox.getChildren().add(playerName);
-		}
-		playerNamesGroup.getChildren().add(playerNamesHbox);
-		playerNamesGroup.setTranslateY(450);
+
 		
-		root.getChildren().addAll(playerGroup, characterGroup, playerNamesGroup);
+		root.getChildren().addAll(playerGroup, characterGroup);
 		return new Scene(root, 1000, 800);
 	}
 	
+	/**
+	 * Disable Ready button.
+	 */
 	public void disableReady()
 	{
 		readyButton.setDisable(true);
 	}
 	
+	/**
+	 * Enable Ready button.
+	 */
 	public void enableReady()
 	{
 		readyButton.setDisable(false);
 	}
 	
-	public void addPlayer(String playerName)
+	/**
+	 * This function adds a new player to the lobby
+	 * @param playerName - Name of player added to scene
+	 * @param isOwner - Controls whether player is root player or other player
+	 * @param id - Id is the unique id of player
+	 * @param color - Color representing character selected
+	 */
+	public void addPlayer(String playerName, boolean isOwner ,int id, int color)
 	{
-		allPlayerNames.add(playerName);
+		// Adds player to array list of players
+		//TODO: returns boolean, should check if player actually joined
+		addPlayer( playerName, id, color);
 		
-        HBox playerNamesHbox = new HBox(120);
-        Group playerNamesGroup = new Group();
-		for (int i = 0; i < allPlayerNames.size(); ++i)
+		// If new player is the root player for this application, set id to assignedPlayerIndex
+		if(isOwner)
 		{
-			playerChoiceSpot currentSpot = playerChoiceSpots[i];
-			Text playerNameText = new Text(allPlayerNames.get(i));
-			playerNameText.setLayoutY(currentSpot.getLayoutY() - 50);
-			playerNamesHbox.getChildren().add(playerNameText);
+			assignedPlayerIndex = id;
+			System.out.println("Made it 8: " + assignedPlayerIndex);
 		}
-		playerNamesGroup.getChildren().add(playerNamesHbox);
-		playerNamesGroup.setTranslateY(450);
-		root.getChildren().add(playerNamesGroup);
+		
+		allPlayerNames.set(id, playerName);
+		
+		Group playerGroup = new Group();
+		HBox playerHbox = new HBox(50);
+		int x = 100;
+		int y = 480;
+		for (int i = 0; i < playerChoiceSpots.length; ++i)
+		{
+			playerChoiceSpots[i] = new PlayerChoiceSpot(x,y);
+			playerChoiceSpots[i].setFill(Color.GRAY);
+			playerChoiceSpots[i].setStroke(Color.BLACK);
+			Text text = new Text(allPlayerNames.get(i));
+			stackPanes[i] = new StackPane();
+			stackPanes[i].getChildren().addAll(playerChoiceSpots[i], text);
+			playerHbox.getChildren().add(stackPanes[i]);
+		}
+		playerGroup.getChildren().add(playerHbox);
+		playerGroup.setTranslateY(500);
+		
+		root.getChildren().add(playerGroup);
 	}
 	
-	public void updatePlayerColor(String playerName, Color choice)
+	private boolean addPlayer(String name, int id, int character)
 	{
-		int index = allPlayerNames.indexOf(playerName);
-		playerChoiceSpots[index].setColor(choice);
+		Player temp = new Player();;
+		temp.setName(name);
+		temp.setPlayerId(id);
+		temp.setCharacter(character);
+		
+		return players.add(temp);
 	}
+
+	/**
+	 * Converts JavaFX Color to Integer in order to send serialize data to send Message
+	 * @param color
+	 * @return int value representing color
+	 */
+	private int colorConverter(Color color)
+	{
+		int value = -1;
+		
+		if(color.equals(Color.DARKRED))
+		{
+			value = 0;
+		}
+		else if(color.equals(Color.YELLOW))
+		{
+			value = 1;
+		}
+		else if(color.equals(Color.WHITE))
+		{
+			value = 2;
+		}
+		else if(color.equals(Color.GREEN))
+		{
+			value = 3;
+		}
+		else if(color.equals(Color.CADETBLUE))
+		{
+			value = 4;
+		}
+		else if(color.equals(Color.PLUM))
+		{
+			value = 5;
+		}
+		else
+		{
+			value = -1;
+		}
+
+		return value;
+	}
+	
+	
 
 }
