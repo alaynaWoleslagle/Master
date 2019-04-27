@@ -8,119 +8,148 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import controller.ViewController;
 
-public class ConnectionScreen {
+/**
+ * This class handles the creation of Connection Screen for the GUI 
+ *
+ */
+public class ConnectionScreen 
+{
 	
-	// For testing, ignore these
-	// have to be global for some reason to do assignment in event handler (weird scoping with local variables)
-//    boolean newGameIdOk = false;
-//    boolean existingGameIdOk = false;
-//    boolean playerNameOK = false;
+	boolean isNewGame = false;
+	private static int port = -1;
+	private UserInterface ui;
+
     
-    playerChoiceSpot[] playerChoiceSpots = new playerChoiceSpot[6];
+    PlayerChoiceSpot[] playerChoiceSpots = new PlayerChoiceSpot[6];
     Rectangle[] characterChoices = new Rectangle[6];
 
 	
-	public ConnectionScreen()
+	public ConnectionScreen(UserInterface ui, boolean isNewGame)
 	{
-        	
+        this.ui = ui;
+        this.isNewGame = isNewGame;
 	}
 	
-	public Scene createScene(String type) {
+	public Scene createScene() 
+	{
 		
 		StackPane root = new StackPane();
 		
+        /**
+         * Text Field for Game Port Number.
+         */
         TextField gameIdField = new TextField();
-        gameIdField.setMaxWidth(400);
-        Text gameIdText = new Text();
-        if (type == "join")
-        {
-        		gameIdText.setText("Enter game id to join game");
-        }
-        else
-        {
-        		gameIdText.setText("Enter new game id");
-        }
+        gameIdField.setMaxWidth(200);
+        
+        /**
+         * Set the Text for Port Number.
+         */
+        Text gameIdText = new Text("Enter Game Port Number.");
         gameIdText.setTranslateY(gameIdField.getTranslateY() - 50);
         
+        /**
+         * Text Field for Player Name.
+         */
         TextField playerNameField = new TextField();
-        playerNameField.setMaxWidth(400);
+        playerNameField.setMaxWidth(200);
         playerNameField.setTranslateY(gameIdField.getTranslateY() + 100);
+        
+        /**
+         * Set the Text for Player Name.
+         */
         Text playerNameText = new Text("Enter your player name");
         playerNameText.setTranslateY(playerNameField.getTranslateY() - 50);
         
+        /**
+         * Create Continue Button.
+         */
         Button continueButton = new Button("Continue");
         continueButton.setTranslateY(playerNameField.getTranslateY() + 100);
 
-        EventHandler<ActionEvent> continueClicked = new EventHandler<ActionEvent>() { 
+        /**
+         *  Add All objects to stack pane
+         */
+        root.getChildren().addAll(gameIdText, gameIdField, playerNameField, playerNameText, continueButton);
+        Scene connectionScene = new Scene(root, 250, 500);
+        
+        /**
+         * Create Event Handler for Continue Button.
+         */
+        EventHandler<ActionEvent> continueClicked = new EventHandler<ActionEvent>() 
+        { 
             public void handle(ActionEvent e) 
-            {
-            	//TODO: move logic to GameProcessor?
-            	// For testing only, ignore this
-//                existingGameIdOk = validateExistingGameId(gameIdField.getText());
-//                newGameIdOk = validateNewGameId(gameIdField.getText());
-//                playerNameOK = validatePlayerName(playerNameField.getText());
-//                
-//                if (playerNameOK)
-//                {
-//                		if (type == "join" && existingGameIdOk)
-//                		{
-//                			createLobby(stage);
-//                		}
-//                		else if (type == "new" && newGameIdOk)
-//                		{
-//                			createLobby(stage);
-//                		}
-//                		
-//                }
-//                if (!newGameIdOk && type == "new")
-//                {
-//	                	Text gameIdErrorText = new Text("New game id not valid!");
-//	            		gameIdErrorText.setTranslateY(continueButton.getTranslateY() + 35);
-//	            		gameIdErrorText.setFill(Color.RED);
-//	            		root.getChildren().add(gameIdErrorText);
-//                }
-//                if (!existingGameIdOk && type == "join")
-//                {
-//                		Text gameIdErrorText = new Text("Game id not found!");
-//                		gameIdErrorText.setTranslateY(continueButton.getTranslateY() + 35);
-//                		gameIdErrorText.setFill(Color.RED);
-//                		root.getChildren().add(gameIdErrorText);
-//                }
-//                if(!playerNameOK)
-//                {
-//                		Text playerNameErrorText = new Text("Player name already exists or is invalid!");
-//                		playerNameErrorText.setTranslateY(continueButton.getTranslateY() + 55);
-//                		playerNameErrorText.setFill(Color.RED);
-//                		root.getChildren().add(playerNameErrorText);
-//                }
+            {	
+            	/** Validate Name */
+            	String name = playerNameField.getText();
+            	
+            	if(validPlayerName(name) && validPortNumber(gameIdField.getText()))
+            	{
+                	ViewController.getInstance();
+                	ViewController.joinNewPlayer(playerNameField.getText(), ConnectionScreen.port, isNewGame, ui);
+            	}
+            	else
+            	{
+            		// TODO: Make Text Field Box Highlighted in Red. Give notice to user to re-enter valid name
+            		// TODO: Figure out if every player needs a unique name
+            	}
+            
             } 
         };
+        
         continueButton.setOnAction(continueClicked);
         
-        root.getChildren().addAll(gameIdText, gameIdField, playerNameField, playerNameText, continueButton);
-        Scene connectionScene = new Scene(root, 700, 900);
+
         
         return connectionScene;
 	}
 	
-	// all for testing only, ignore
-//	private boolean validateExistingGameId(String gameId)
-//	{
-//		
-//		return true;
-//	}
-//	
-//	private boolean validateNewGameId(String gameId)
-//	{
-//		
-//		return true;
-//	}
-//	
-//	private boolean validatePlayerName(String playerName)
-//	{
-//		
-//		return true;
-//	}
+	/**
+	 * Check if port number is valid
+	 * @param val Port value
+	 * @return true if port is valid
+	 */
+	private boolean validPortNumber(String val)
+	{
+		// Check to see if there are any spaces in string
+		if(val.matches("^\\s*$"))
+		{
+			// Remove all white spaces
+			 val.replaceAll("\\s+","");
+		}
+		
+		// Check if port contains only numbers
+		if(val.matches("[0-9]+"))
+		{
+			// Parse user input to integer
+			port = Integer.parseInt(val);
+			//Check if port is within valid range
+			if( port > 1024 && port < 65200)
+			{
+				return true;
+			}
+			else
+			{
+				port = -1;
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}		
+	}
+	
+	/**
+	 * Returns whether the Player name is valid or not.
+	 * Name shouldn't contain spaces, numbers, or can't be empty
+	 * @param name
+	 * @return true if name is valid
+	 */
+	private boolean validPlayerName(String name)
+	{
+		return !name.contains(" ") && !name.matches(".*\\d.*") && !name.isEmpty();
+	}
 
 }
