@@ -21,17 +21,27 @@ public class Player
 	
 	private volatile boolean isReady;
 	
+	/** TODO: This is a place holder. 
+	 * Currently the player character is represented by a color on the UI.*/
+	private volatile int character;
+	
 	/**
 	 * Player Object constructor.
 	 * @param name: Name of player
 	 * @param id:	Unique id of player
 	 */
+	public Player(String name, int id)
+	{
+		setName(name);
+		setPlayerId(id);
+	}
 	public Player(String name, int id, int[] position)
 	{
 		setName(name);
 		setPlayerId(id);
 		setPosition(position);
 	}
+	
 	
 	/**
 	 * Default Player Object constructor.
@@ -113,6 +123,14 @@ public class Player
 	public synchronized void setReady(boolean isReady) 
 	{
 		this.isReady = isReady;
+	}
+
+	public int getCharacter() {
+		return character;
+	}
+
+	public void setCharacter(int character) {
+		this.character = character;
 	}
 
 }
