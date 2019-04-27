@@ -1,7 +1,7 @@
 package controller;
 
 import logic.GameProcessor;
-import view.UserInterface;
+import gui.UserInterface;
 
 public class ViewController 
 {
