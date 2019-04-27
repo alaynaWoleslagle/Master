@@ -3,6 +3,13 @@ package logic;
 import messages.BaseMessage;
 import messages.GameLogicMessage;
 import messages.PlayerStatusMessage;
+import controller.ViewController;
+import javafx.scene.Scene;
+import messages.BaseMessage.Action;
+import socket.Client;
+import socket.ClientMessageReceiver;
+import socket.Server;
+import socket.ServerMessageReceiver;
 import utils.Player;
 import utils.PlayerManager;
 
@@ -11,7 +18,8 @@ import java.lang.reflect.Array;
 import java.util.*;
 import java.util.HashMap;
 
-public class GameProcessor {
+public class GameProcessor
+{
     private static volatile GameProcessor instance = null;
 
     private static String [][] board;
@@ -38,9 +46,13 @@ public class GameProcessor {
 
     private static boolean winner;
 
+	private static LobbyScreen lobby = null;
+    private static Scene lobbyScene = null;
+    private static UserInterface userInterface;
 
-    private GameProcessor(){
 
+	private GameProcessor()
+	{
         /**
          *  This checks to ensure no other instance is created using Reflection API
          */
@@ -276,18 +288,18 @@ public class GameProcessor {
 
 
 
-    public static logic.GameProcessor getInstance()
+    public static GameProcessor getInstance()
     {
         if (instance == null)
         {
-            /**
-             *  This is a thread-safe check to ensure another thread can't initialize another MessageReceiver class.
-             */
-            synchronized (logic.GameProcessor.class)
+        	/**
+        	 *  This is a thread-safe check to ensure another thread can't initialize another MessageReceiver class.
+        	 */
+            synchronized (GameProcessor.class)
             {
                 if (instance == null)
                 {
-                    instance = new logic.GameProcessor();
+                	instance = new GameProcessor();
                 }
 
             }
@@ -299,31 +311,115 @@ public class GameProcessor {
 
     public static void  processMessage(Object msg)
     {
-        if( msg instanceof PlayerStatusMessage)
-        {
-            PlayerStatusMessage tmpMsg = (PlayerStatusMessage)msg;
-            Player tmp = new Player();
-            tmp.setName(tmpMsg.getName());
-            tmp.setPlayerId(tmpMsg.getPlayerId());
+    	if( msg instanceof PlayerStatusMessage )
+    	{
+        	PlayerStatusMessage tmpMsg = (PlayerStatusMessage)msg;
+        	Player tmp = new Player();
+        	tmp.setName(tmpMsg.getName());
+        	tmp.setPlayerId(tmpMsg.getPlayerId());
 
-            if(tmpMsg.getType() == BaseMessage.Action.INIT)
-            {
-                PlayerManager.setPlayer(tmp);
-            }
-            else if(tmpMsg.getType() == BaseMessage.Action.PLAYER_JOIN)
-            {
-                PlayerManager.addNewPlayer(tmp);
-            }
-        }
-        /*
-        if(msg instanceof GameLogicMessage){
-            GameLogicMessage tmpMsg = (GameLogicMessage)msg;
-            if(tmpMsg.getType() == BaseMessage.Action.TURN){
+    		if(tmpMsg.getType() == Action.INIT)
+    		{
+    			PlayerManager.setPlayer(tmp);
+    		}
+    		else if(tmpMsg.getType() == Action.PLAYER_JOIN)
+    		{
+        		PlayerManager.addNewPlayer(tmp);
+    		}
+    	}
+      else if(msg instanceof GameLogicMessage)
+		  {
+          GameLogicMessage tmpMsg = (GameLogicMessage)msg;
+          if(tmpMsg.getType() == Action.TURN)
+			    {
 
-            }
+          }
 
-        }
-        */
+      }
     }
+
+    public static void initializeClientServer(String name, int port, boolean newgame, UserInterface ui)
+    {
+    	// TODO: Allow New game option to select port. Currently port not used.
+    	userInterface = ui;
+    	/**
+    	 * If newgame is TRUE, initialize Game Server.
+    	 */
+    	if(newgame)
+    	{
+    		Runnable listener = new Runnable()
+    		{
+    			@Override
+    			public void run()
+    			{
+    				ServerMessageReceiver.getInstance();
+    				Server.getInstance();
+    			}
+    		};
+
+    		Thread processThread = new Thread(listener);
+    		processThread.setDaemon(true);
+    		processThread.start();
+    	}
+
+    	createClient(name);
+
+		try
+	   	{
+		Thread.sleep(100);
+	   	}
+	   	catch (InterruptedException e)
+	   	{
+	   		// TODO Auto-generated catch block
+	   		e.printStackTrace();
+	   	}
+		createLobby();
+
+    }
+
+	private static void createClient(String name)
+	{
+		Client.getInstance();
+		PlayerManager.initializePlayer(name);
+	}
+
+	private static void createLobby()
+	{
+		System.out.println("Made it 6" + PlayerManager.getPlayer());
+		lobby = new LobbyScreen(2, PlayerManager.getPlayer().getName());
+		lobbyScene = lobby.createLobby();
+		userInterface.setScene(lobbyScene);
+	}
+
+	/**
+	 * This function handles the player character selection.
+	 * When a player selects a character, a function call is made to ViewController with
+	 * the intended purpose of sending the player character selection over the socket connection
+	 * to the other game players.
+	 * @param playerId
+	 * @param color
+	 */
+	public static void registerCharacterSelection(int playerId, int color)
+	{
+		PlayerStatusMessage msg = new PlayerStatusMessage();
+		msg.setPlayerId(playerId);
+		msg.setVarField1(color);
+		msg.setType(Action.PLAYER_SELECTION);
+
+		ClientMessageReceiver.sendMessage(msg);
+		System.out.println("TRAEEE Msg Sent");
+	}
+
+	public static void playerSelection(PlayerStatusMessage msg)
+	{
+		Player player = PlayerManager.getOtherPlayer(msg.getPlayerId());
+		if (player == null)
+		{
+			System.out.println("Made it 29");
+		}
+
+		lobby.addPlayer(player.getName(), false, player.getPlayerId(), msg.getVarField1());
+	}
+
 
 }
