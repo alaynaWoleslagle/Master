@@ -4,6 +4,8 @@ import messages.BaseMessage;
 import messages.GameLogicMessage;
 import messages.PlayerStatusMessage;
 import controller.ViewController;
+import gui.LobbyScreen;
+import gui.UserInterface;
 import javafx.scene.Scene;
 import messages.BaseMessage.Action;
 import socket.Client;
@@ -18,7 +20,7 @@ import java.lang.reflect.Array;
 import java.util.*;
 import java.util.HashMap;
 
-public class GameProcessor
+public class GameProcessor 
 {
     private static volatile GameProcessor instance = null;
 
@@ -45,7 +47,7 @@ public class GameProcessor
     private static ArrayList<Integer> blacklist = new ArrayList<>();
 
     private static boolean winner;
-
+	
 	private static LobbyScreen lobby = null;
     private static Scene lobbyScene = null;
     private static UserInterface userInterface;
@@ -290,18 +292,18 @@ public class GameProcessor
 
     public static GameProcessor getInstance()
     {
-        if (instance == null)
-        {
+        if (instance == null) 
+        { 
         	/**
         	 *  This is a thread-safe check to ensure another thread can't initialize another MessageReceiver class.
         	 */
-            synchronized (GameProcessor.class)
+            synchronized (GameProcessor.class) 
             {
                 if (instance == null)
                 {
                 	instance = new GameProcessor();
                 }
-
+                
             }
         }
 
@@ -317,7 +319,7 @@ public class GameProcessor
         	Player tmp = new Player();
         	tmp.setName(tmpMsg.getName());
         	tmp.setPlayerId(tmpMsg.getPlayerId());
-
+        	
     		if(tmpMsg.getType() == Action.INIT)
     		{
     			PlayerManager.setPlayer(tmp);
@@ -325,19 +327,20 @@ public class GameProcessor
     		else if(tmpMsg.getType() == Action.PLAYER_JOIN)
     		{
         		PlayerManager.addNewPlayer(tmp);
-    		}
+    		}        	
     	}
-      else if(msg instanceof GameLogicMessage)
-		  {
-          GameLogicMessage tmpMsg = (GameLogicMessage)msg;
-          if(tmpMsg.getType() == Action.TURN)
-			    {
+        else if(msg instanceof GameLogicMessage)
+		{
+            GameLogicMessage tmpMsg = (GameLogicMessage)msg;
+            if(tmpMsg.getType() == Action.TURN)
+			{
 
-          }
+            }
 
-      }
+        }
     }
 
+    
     public static void initializeClientServer(String name, int port, boolean newgame, UserInterface ui)
     {
     	// TODO: Allow New game option to select port. Currently port not used.
@@ -356,43 +359,43 @@ public class GameProcessor
     				Server.getInstance();
     			}
     		};
-
+    		
     		Thread processThread = new Thread(listener);
     		processThread.setDaemon(true);
     		processThread.start();
     	}
-
+    	
     	createClient(name);
-
-		try
+    	
+		try 
 	   	{
 		Thread.sleep(100);
-	   	}
-	   	catch (InterruptedException e)
+	   	} 
+	   	catch (InterruptedException e) 
 	   	{
 	   		// TODO Auto-generated catch block
 	   		e.printStackTrace();
 	   	}
-		createLobby();
-
+		createLobby();    
+		
     }
-
+    
 	private static void createClient(String name)
 	{
 		Client.getInstance();
 		PlayerManager.initializePlayer(name);
 	}
-
+	
 	private static void createLobby()
 	{
 		System.out.println("Made it 6" + PlayerManager.getPlayer());
 		lobby = new LobbyScreen(2, PlayerManager.getPlayer().getName());
-		lobbyScene = lobby.createLobby();
+		lobbyScene = lobby.createScene();
 		userInterface.setScene(lobbyScene);
 	}
 
 	/**
-	 * This function handles the player character selection.
+	 * This function handles the player character selection. 
 	 * When a player selects a character, a function call is made to ViewController with
 	 * the intended purpose of sending the player character selection over the socket connection
 	 * to the other game players.
@@ -405,11 +408,11 @@ public class GameProcessor
 		msg.setPlayerId(playerId);
 		msg.setVarField1(color);
 		msg.setType(Action.PLAYER_SELECTION);
-
+		
 		ClientMessageReceiver.sendMessage(msg);
 		System.out.println("TRAEEE Msg Sent");
 	}
-
+	
 	public static void playerSelection(PlayerStatusMessage msg)
 	{
 		Player player = PlayerManager.getOtherPlayer(msg.getPlayerId());
@@ -417,9 +420,9 @@ public class GameProcessor
 		{
 			System.out.println("Made it 29");
 		}
-
+		
 		lobby.addPlayer(player.getName(), false, player.getPlayerId(), msg.getVarField1());
 	}
-
+    
 
 }

@@ -11,12 +11,13 @@ public class UserInterface extends Application
 
 	private Stage stage;
 
-	/*public static void main(String[] args) {
+	/*public static void main(String[] args)
+	{
 		launch(args);
 	}*/
 
 	@Override
-	public void start(Stage stage) throws Exception
+	public void start(Stage stage) throws Exception 
 	{
 		this.stage = stage;
 
@@ -54,7 +55,7 @@ public class UserInterface extends Application
 //		setScene(suggestAccuseScene);
 	}
 
-	public void setScene(Scene scene)
+	public void setScene(Scene scene) 
 	{
 		//order is important: width and height must be set before scene is set
 		stage.setWidth(scene.getWidth());
@@ -62,7 +63,7 @@ public class UserInterface extends Application
 		stage.setScene(scene);
 		stage.show();
 	}
-
+	
 	public UserInterface getUI()
 	{
 		return this;

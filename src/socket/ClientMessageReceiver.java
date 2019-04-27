@@ -11,17 +11,17 @@ import utils.PlayerManager;
  *
  * This class is responsible for receiving Messages from the Queue.
  * Messages are added to a Queue which is will then be processed on a separate thread.
- *
+ * 
  * This class acts as an interface between the Client socket and main Game logic through the receipt of messages.
  * @author Trae
- *
- * @version 2.1
+ * 
+ * @version 2.1 
  *
  */
 public class ClientMessageReceiver extends MessageReceiver
 {
     private static volatile ClientMessageReceiver msgReceiver = null;
-
+	
 	private ClientMessageReceiver()
 	{
         /**
@@ -40,34 +40,34 @@ public class ClientMessageReceiver extends MessageReceiver
         	}
         }
 	}
-
+	
 	/**
 	 * Returns the Singleton instance of ClientMessageReceiver class
 	 * @return ClientMessageReceiver
 	 */
-    public static ClientMessageReceiver getInstance()
+    public static ClientMessageReceiver getInstance() 
     {
-        if (msgReceiver == null)
-        {
+        if (msgReceiver == null) 
+        { 
         	/**
         	 *  This is a thread-safe check to ensure another thread can't initialize another MessageReceiver class.
         	 */
-            synchronized (ClientMessageReceiver.class)
+            synchronized (ClientMessageReceiver.class) 
             {
                 if (msgReceiver == null)
                 {
                 	msgReceiver = new ClientMessageReceiver();
                 }
-
+                
             }
         }
 
         return msgReceiver;
     }
-
-
+    
+    
     /**
-     * process
+     * process 
      */
 	protected void process()
 	{
@@ -79,11 +79,11 @@ public class ClientMessageReceiver extends MessageReceiver
         	{
             	while(running)
             	{
-            		try
+            		try 
          		   	{
             			Thread.sleep(10);
-         		   	}
-         		   	catch (InterruptedException e)
+         		   	} 
+         		   	catch (InterruptedException e) 
          		   	{
          		   		// TODO Auto-generated catch block
          		   		e.printStackTrace();
@@ -105,9 +105,9 @@ public class ClientMessageReceiver extends MessageReceiver
             		{
         				//System.out.println("Queue Empty");
             		}
-
+            		
             	}
-
+            	
         	}
         };
         processThread = new Thread(listener);
@@ -123,8 +123,8 @@ public class ClientMessageReceiver extends MessageReceiver
     {
     	Client.send(msg);
     }
-
-
+   
+    
     /**
      * TODO: This function routes incoming messages to for main processing.
      * TODO: Game logic function should be called here. Function that receives Message and processes it.
@@ -135,14 +135,14 @@ public class ClientMessageReceiver extends MessageReceiver
     	if(object instanceof PlayerStatusMessage)
     	{
     		PlayerStatusMessage msg = (PlayerStatusMessage) object;
-
+    		
     		processStatusMessage(msg);
     	}
 
       GameProcessor.processMessage(msg);
 
     }
-
+    
     private void processStatusMessage(PlayerStatusMessage msg)
     {
 		if(msg.getType() == Action.PLAYER_JOIN)
@@ -155,6 +155,7 @@ public class ClientMessageReceiver extends MessageReceiver
 		{
 			Player player = new Player(msg.getName(), msg.getPlayerId());
 			PlayerManager.setPlayer(player);
+			
 		}
   }
 }
