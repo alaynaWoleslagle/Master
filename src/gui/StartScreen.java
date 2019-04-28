@@ -9,51 +9,90 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-public class StartScreen {
+/** 
+ * This class is responsible for Generating the start screen.
+ *
+ */
+public class StartScreen 
+{
 
 	private UserInterface ui;
 	
+	/**
+	 * Start Screen Constructor
+	 * @param ui UserInterface
+	 */
 	public StartScreen(UserInterface ui)
 	{
 		this.ui = ui;
 	}
 	
-	public Scene createStartScene() {
+	/**
+	 * Creates the start screen
+	 * @return Scene Object
+	 */
+	public Scene createStartScene() 
+	{
 		
 		StackPane root = new StackPane();
-        Text welcomeText = new Text("Welcome to Clue-Less!");
-        welcomeText.setStyle("-fx-font: 48 arial;");
-        welcomeText.setTextAlignment(TextAlignment.CENTER);
-        Button joinButton = new Button("Join Game");
-        Button startButton = new Button("Start a New Game");
-        root.getChildren().addAll(welcomeText, joinButton, startButton);
-        StackPane.setAlignment(welcomeText, Pos.CENTER);
-        joinButton.setMinWidth(150);
-        startButton.setMinWidth(150);
-        joinButton.setTranslateY(welcomeText.getTranslateY() + 100);
-        startButton.setTranslateY(welcomeText.getTranslateY() + 150);
         
-        EventHandler<ActionEvent> joinGameClicked = new EventHandler<ActionEvent>() { 
+		/**
+         * Set the Text for Welcome screen.
+         */
+		Text welcomeText = new Text("Welcome to Clue-Less!");
+        welcomeText.setStyle("-fx-font: 24 arial;");
+        welcomeText.setTextAlignment(TextAlignment.CENTER);
+        StackPane.setAlignment(welcomeText, Pos.CENTER);
+
+        /**
+         * Create Join Game Button
+         */
+        Button joinButton = new Button("Join Game");
+        joinButton.setMinWidth(150);
+        joinButton.setTranslateY(welcomeText.getTranslateY() + 100);
+
+        /**
+         * Create Start New Game Button
+         */
+        Button startButton = new Button("Start a New Game");
+        startButton.setMinWidth(150);
+        startButton.setTranslateY(welcomeText.getTranslateY() + 150);
+
+        /**
+         * Add Text and Button elements to the Screen.
+         */
+        root.getChildren().addAll(welcomeText, joinButton, startButton);
+		Scene startScene = new Scene(root, 350, 500);
+
+        /**
+         * Create Event Handler for Join button.
+         */
+        EventHandler<ActionEvent> joinGameClicked = new EventHandler<ActionEvent>() 
+        { 
             public void handle(ActionEvent e) 
             {
-				ConnectionScreen connectionScreen = new ConnectionScreen();
-            	ui.setScene(connectionScreen.createScene("join"));
+				ConnectionScreen connectionScreen = new ConnectionScreen(ui, false);
+            	ui.setScene(connectionScreen.createScene());
             } 
         }; 
         
-        EventHandler<ActionEvent> startNewGameClicked = new EventHandler<ActionEvent>() { 
+        /**
+         * Create Event Handler for New Game button.
+         */
+        EventHandler<ActionEvent> startNewGameClicked = new EventHandler<ActionEvent>() 
+        { 
             public void handle(ActionEvent e) 
             {
-				ConnectionScreen connectionScreen = new ConnectionScreen();
-				ui.setScene(connectionScreen.createScene("new"));
+				ConnectionScreen connectionScreen = new ConnectionScreen(ui, true);
+				ui.setScene(connectionScreen.createScene());
             }
         }; 
   
         joinButton.setOnAction(joinGameClicked); 
         startButton.setOnAction(startNewGameClicked);
         
-		Scene startScene = new Scene(root, 700, 900);
 		
 		return startScene;
 	}
+	
 }

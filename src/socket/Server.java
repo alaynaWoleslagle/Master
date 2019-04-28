@@ -281,12 +281,11 @@ class ClientHandler
                 				System.out.println("Made it 3");
         		    			msgReceiver.updatePlayerStartStatus(playerId);
         		    		}
-            				else
+            				else if(msg.getType() == Action.PLAYER_SELECTION)
             				{
                 				System.out.println("Made it 4");
-                				//msgReceiver.processIncomingMessage(object);
+                				updateCharacterSelection(msg);
             				}
-        					
         		    	}
 
         			}
@@ -335,6 +334,17 @@ class ClientHandler
 		// Update Other Players
 		player.setType(Action.PLAYER_JOIN);
 		Server.broadcast(this, player);
+	}
+	
+	private void updateCharacterSelection(PlayerStatusMessage msg)
+	{
+		if(msg.getPlayerId() == this.playerId)
+		{
+			msgReceiver.updatePlayerCharacter(msg);
+		}
+		System.out.println("Made it 11");
+		Server.broadcast(this, msg);
+		
 	}
 	
 

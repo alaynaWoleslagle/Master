@@ -119,8 +119,17 @@ public class ServerMessageReceiver extends MessageReceiver
 		playerTruth.put(object.getPlayerId(), player);
 		System.out.println("[INFO]: Player added to game. " + player.getName());
 	}
+	
+	protected synchronized void updatePlayerCharacter(PlayerStatusMessage object)
+	{
+		playerTruth.computeIfPresent(object.getPlayerId(), (k,c) -> updateCharacter(c, object.getVarField1()));
+	}
     
-    
+    private Player updateCharacter(Player player, int color)
+    {
+    	player.setCharacter(color);
+    	return player;
+    }
 
 
 }

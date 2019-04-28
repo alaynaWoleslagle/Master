@@ -117,7 +117,12 @@ public class PlayerManager
 	
 	public static int playerCount()
 	{
-		return playerList.size();
+		return playerList.size() + 1;
+	}
+	
+	public synchronized static Player getOtherPlayer(int playerId)
+	{
+		return playerList.get(playerId);
 	}
         
 }

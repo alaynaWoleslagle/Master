@@ -117,7 +117,6 @@ public class Client
 		{
 			if(!socket.isClosed()) 
 			{
-				System.out.println("--> Sending Object:   " + msg);
 				out.writeObject(msg);
 				sent = true;
 			}

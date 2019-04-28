@@ -30,7 +30,7 @@ public abstract class BaseMessage implements Serializable
 	
 	public enum Action
 	{
-		INIT, PLAYER_JOIN, START, TURN;
+		INIT, PLAYER_JOIN, START, PLAYER_SELECTION, TURN;
 	}
 	
 	/**
@@ -52,6 +52,17 @@ public abstract class BaseMessage implements Serializable
 	 *            responsible for Maintaining Official Player list.
 	 */
 	private int playerId = -1;
+	
+	
+	/**
+	 * varField1: Variable Field 1.
+	 * 			  This field is a multi-purpose field intended to be used for the purpose
+	 * 			  of setting sending an interger value over the socket. 
+	 * NOTE: It is recommended to be used only when there is a specified Action and a specific function to 
+	 * 		 handle it. This field should only have ONE purpuse per Action in order to prevent improperly handling
+	 *       a message.
+	 */
+	private int varField1 = -1;
 	
 
 	/**
@@ -110,6 +121,27 @@ public abstract class BaseMessage implements Serializable
 	{
 		this.playerId = playerId;
 	}
+
+
+	/**
+	 * Get VarField1
+	 * @return VarField1
+	 */
+	public int getVarField1() 
+	{
+		return varField1;
+	}
+
+	/**
+	 * Sets varField1
+	 * @param varField1
+	 */
+	public void setVarField1(int varField1) 
+	{
+		this.varField1 = varField1;
+	}
+	
+	
 	
 
 }
