@@ -139,7 +139,7 @@ public class ClientMessageReceiver extends MessageReceiver
     		processStatusMessage(msg);
     	}
 
-      GameProcessor.processMessage(msg);
+    	GameProcessor.processMessage(object);
 
     }
     

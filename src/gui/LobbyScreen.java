@@ -1,7 +1,8 @@
 package gui;
 
 import java.util.ArrayList;
-import controller.ViewController;
+import java.util.Arrays;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -13,6 +14,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import logic.GameProcessor;
 import utils.Player;
 
 public class LobbyScreen 
@@ -117,7 +119,7 @@ public class LobbyScreen
 	            {
 	            	Color charColor = (Color) character.getFill();
 	            	currentPlayerSpot.setColor(charColor);
-	            	ViewController.registerCharacterSelection(assignedPlayerIndex, colorConverter(charColor));
+	            	GameProcessor.registerCharacterSelection(assignedPlayerIndex,  colorConverter(charColor));
 	            }
 	        });
 		}

@@ -8,7 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import controller.ViewController;
+import logic.GameProcessor;
 
 /**
  * This class handles the creation of Connection Screen for the GUI 
@@ -86,8 +86,8 @@ public class ConnectionScreen
             	
             	if(validPlayerName(name) && validPortNumber(gameIdField.getText()))
             	{
-                	ViewController.getInstance();
-                	ViewController.joinNewPlayer(playerNameField.getText(), ConnectionScreen.port, isNewGame, ui);
+                	GameProcessor.getInstance();
+            		GameProcessor.initializeClientServer(name, port, isNewGame, ui);
             	}
             	else
             	{
