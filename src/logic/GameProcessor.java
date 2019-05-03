@@ -342,7 +342,12 @@ public class GameProcessor
     		else if(tmpMsg.getType() == Action.PLAYER_JOIN)
     		{
         		PlayerManager.addNewPlayer(tmp);
-    		}        	
+    		}
+
+			if (lobby != null)
+			{
+				playerSelection(tmpMsg);
+			}
     	}
         else if(msg instanceof GameLogicMessage)
 		{
@@ -403,7 +408,7 @@ public class GameProcessor
 	private static void createLobby()
 	{
 		System.out.println("Made it 6" + PlayerManager.getPlayer());
-		lobby = new LobbyScreen(2, PlayerManager.getPlayer().getName());
+		lobby = new LobbyScreen(PlayerManager.getPlayer().getPlayerId(), PlayerManager.getPlayer().getName());
 		lobbyScene = lobby.createScene();
 		userInterface.setScene(lobbyScene);
 	}
