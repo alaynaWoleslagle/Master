@@ -193,6 +193,8 @@ public class GameProcessor
 
         if (guess!=null)
         {
+            System.out.println("incorrect guess, you can no longer make moves");
+            /*
             for(int i=0; i<3; i++)
             {
                 if (Arrays.asList(solution).contains(guess[i])==false)
@@ -206,19 +208,17 @@ public class GameProcessor
 
                 }
             }
+            */
         }
 
         if (suggestion!=null)
         {
-            //move player
-            for(int i=0; i<3; i++)
-            {
-                if (Arrays.asList(solution).contains(guess[i])==false)
-                {
-                    //need to show whose card the disproof belonged to
-                }
+            //need to move player
+            int [] location = player.getPosition();
+            System.out.println("In room: " + board[location[0]][location[1]]);
+            if (suggestion[0]!=board[location[0]][location[1]]){
+                System.out.println("not in the right room");
             }
-        }
     }
 
     public static int[] makeMove (String move, int[] position)
@@ -229,10 +229,12 @@ public class GameProcessor
 
             if(position[1]>4 || position[1]<0)
             {
+                newPosition[0] = position[0];
                 newPosition[1] = position[1];
             }
             else 
             {
+                newPosition[0] = position[0];
                 newPosition[1] = position[1]- 1;
             }
         }
@@ -241,10 +243,12 @@ public class GameProcessor
 
             if (position[1]>4 || position[1]<0)
             {
+                newPosition[0] = position[0];
                 newPosition[1] = position[1];
             }
             else
             {
+                newPosition[0] = position[0];
                 newPosition[1] = position[1]+1;
             }
         }
@@ -254,10 +258,12 @@ public class GameProcessor
             if (position[0]>4 || position[0]<0)
             {
                 newPosition[0] = position[0];
+                newPosition[1] = position[1];
             }
             else 
             {
                 newPosition[0] = position[0]-1;
+                newPosition[1] = position[1];
             }
         }
         else if (move.equals("down"))
@@ -266,19 +272,24 @@ public class GameProcessor
             if (position[0]>4 || position[0]<0)
             {
                 newPosition[0] = position[0];
+                newPosition[1] = position[1];
             }
             else 
             {
                 newPosition[0] = position[0]+1;
+                newPosition[1] = position[1];
             }
         }
-        if (board[newPosition[0]][newPosition[1]] == "deadspace")
-        {
-            return position;
+        if (newPosition[0]<=4 & newPosition[1]<=4 & newPosition[0]>=0 & newPosition[1]>=0 ){
+            if (board[newPosition[0]][newPosition[1]].equals("deadspace")){
+                return position;
+            }
+            else{
+                return newPosition;
+            }
         }
-        else
-        {
-            return newPosition;
+        else {
+            return position;
         }
     }
 
