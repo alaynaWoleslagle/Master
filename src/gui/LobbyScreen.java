@@ -23,12 +23,15 @@ public class LobbyScreen
     private Button readyButton;
     private int assignedPlayerIndex;
     private Group root = new Group();
+
+	private Color[] colors = {Color.DARKRED, Color.YELLOW, Color.WHITE, Color.GREEN, Color.CADETBLUE, Color.PLUM};
     
     /** StackPanes Array */
     StackPane[] stackPanes = new StackPane[6];
 
     /** PlayerChoiceSpot Array */
     PlayerChoiceSpot[] playerChoiceSpots = new PlayerChoiceSpot[6];
+	Text[] playerNameTexts = new Text[6];
     
     /** Rectangle Array */
     Rectangle[] characterChoices = new Rectangle[6];
@@ -87,9 +90,9 @@ public class LobbyScreen
 			playerChoiceSpots[i] = new PlayerChoiceSpot(x,y);
 			playerChoiceSpots[i].setFill(Color.GRAY);
 			playerChoiceSpots[i].setStroke(Color.BLACK);
-			Text text = new Text(allPlayerNames.get(i));
+			playerNameTexts[i] = new Text(allPlayerNames.get(i));
 			stackPanes[i] = new StackPane();
-			stackPanes[i].getChildren().addAll(playerChoiceSpots[i], text);
+			stackPanes[i].getChildren().addAll(playerChoiceSpots[i], playerNameTexts[i]);
 			playerHbox.getChildren().add(stackPanes[i]);
 		}
 		playerGroup.getChildren().add(playerHbox);
@@ -183,25 +186,12 @@ public class LobbyScreen
 		}
 		
 		allPlayerNames.set(id, playerName);
-		
-		Group playerGroup = new Group();
-		HBox playerHbox = new HBox(50);
-		int x = 100;
-		int y = 480;
-		for (int i = 0; i < playerChoiceSpots.length; ++i)
+
+		playerNameTexts[id].setText(playerName);
+		if (color != -1)
 		{
-			playerChoiceSpots[i] = new PlayerChoiceSpot(x,y);
-			playerChoiceSpots[i].setFill(Color.GRAY);
-			playerChoiceSpots[i].setStroke(Color.BLACK);
-			Text text = new Text(allPlayerNames.get(i));
-			stackPanes[i] = new StackPane();
-			stackPanes[i].getChildren().addAll(playerChoiceSpots[i], text);
-			playerHbox.getChildren().add(stackPanes[i]);
+			playerChoiceSpots[id].setColor(colors[color]);
 		}
-		playerGroup.getChildren().add(playerHbox);
-		playerGroup.setTranslateY(500);
-		
-		root.getChildren().add(playerGroup);
 	}
 	
 	private boolean addPlayer(String name, int id, int character)
@@ -254,7 +244,7 @@ public class LobbyScreen
 
 		return value;
 	}
-	
+
 	
 
 }
