@@ -21,6 +21,7 @@ public class LobbyScreen
 {
 	private ArrayList<Player> players = new ArrayList<Player>();
     private Button readyButton;
+    private Text errorText;
     private int assignedPlayerIndex;
     private Group root = new Group();
 
@@ -142,10 +143,13 @@ public class LobbyScreen
         };
         
         readyButton.setOnAction(readyClicked);
-		
 
+        errorText = new Text();
+        errorText.setStroke(Color.RED);
+        errorText.setLayoutY(400);
+		errorText.setLayoutX(50);
 		
-		root.getChildren().addAll(playerGroup, characterGroup);
+		root.getChildren().addAll(playerGroup, characterGroup, errorText);
 		return new Scene(root, 1000, 800);
 	}
 	
@@ -164,7 +168,12 @@ public class LobbyScreen
 	{
 		readyButton.setDisable(false);
 	}
-	
+
+	public void setErrorText(String text) {
+		System.out.println(text);
+		errorText.setText(text);
+	}
+
 	/**
 	 * This function adds a new player to the lobby
 	 * @param playerName - Name of player added to scene

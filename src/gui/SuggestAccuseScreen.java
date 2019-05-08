@@ -11,11 +11,15 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+import logic.GameProcessor;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class SuggestAccuseScreen {
+
+	private Stage stage;
 
 	private String[] characters = {"Miss Scarlet", "Col. Mustard", "Mrs. White", "Mr. Green", "Mrs. Peacock", "Prof. Plum"};
 	private String[] weapons = {"Rope", "Lead Pipe", "Knife", "Wrench", "Candlestick", "Revolver"};
@@ -36,13 +40,15 @@ public class SuggestAccuseScreen {
 	private static final Color UNSELECTED_COLOR = Color.WHITE;
 	private static final Color DISABLED_COLOR = Color.GRAY;
 
-	public SuggestAccuseScreen(String currentRoom)
+	public SuggestAccuseScreen(Stage stage, String currentRoom)
 	{
+		this.stage = stage;
 		selectedRoom = currentRoom;
 		this.isMakingSuggestion = true;
 	}
-	public SuggestAccuseScreen()
+	public SuggestAccuseScreen(Stage stage)
 	{
+		this.stage = stage;
 		this.isMakingSuggestion = false;
 	}
 	
@@ -114,14 +120,20 @@ public class SuggestAccuseScreen {
 		submitBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				//TODO
+				//TODO: massage to whatever method(s) GameProcessor provides for submitting suggestions and accussations
+//				if (isMakingSuggestion)
+//					GameProcessor.submitSuggestion(selectedCharacter, selectedWeapon, selectedRoom);
+//				else
+//					GameProcessor.submitAccusation(selectedCharacter, selectedWeapon, selectedRoom);
+//				System.out.println("Submitted: " + selectedCharacter + ", " + selectedWeapon + ", " + selectedRoom);
+				stage.close();
 			}
 		});
 		Button closeBtn = new Button("Close");
 		closeBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				//TODO
+				stage.close();
 			}
 		});
 		HBox controlsBox = new HBox(10, submitBtn, closeBtn);

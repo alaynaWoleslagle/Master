@@ -11,11 +11,15 @@ public class Hallway extends StackPane {
 
 	private String occupantPlayer;
 	private Circle occupantCircle;
+
+	private boolean isHighlighted = false;
+	private Color defaultColor = Color.WHITESMOKE;
+	private Color highlightColor = Color.GOLD;
 	
 	public Hallway(int x, int y, int width, int height) {
 		super();
 		rect = new Rectangle(width, height);
-		rect.setFill(Color.WHITESMOKE);
+		rect.setFill(defaultColor);
 		rect.setStroke(Color.BLACK);
 
 		getChildren().add(rect);
@@ -42,5 +46,16 @@ public class Hallway extends StackPane {
 
 	public boolean isOccupied() {
 		return occupantPlayer != null;
+	}
+
+	public void toggleHighlight() {
+		if (!isHighlighted) {
+			isHighlighted = true;
+			rect.setFill(highlightColor);
+		}
+		else {
+			isHighlighted = false;
+			rect.setFill(defaultColor);
+		}
 	}
 }

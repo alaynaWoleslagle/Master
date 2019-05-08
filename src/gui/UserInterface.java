@@ -34,8 +34,8 @@ public class UserInterface extends Application
 		//example lobby screen setup
 //		String[] names = {"player1", "player2"};
 //		LobbyScreen lobby = new LobbyScreen(2, names);
-//		Scene lobbyScene = lobby.createLobby();
-//		lobby.addPlayer("EMMA");
+//		Scene lobbyScene = lobby.createScene();
+//		lobby.addPlayer("EMMA", true, 0, 0);
 //		setScene(lobbyScene);
 
 		//example game screen setup

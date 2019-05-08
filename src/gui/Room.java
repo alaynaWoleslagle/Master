@@ -21,11 +21,15 @@ public class Room extends StackPane {
 
 	private static final int[] X_OFFSETS = {-30, 0, 30, -30, 0, 30};
 	private static final int[] Y_OFFSETS = {-30, -30, -30, 30, 30, 30};
+
+	private boolean isHighlighted = false;
+	private Color defaultColor = Color.WHITE;
+	private Color highlightColor = Color.GOLD;
 	
 	public Room(int x, int y, String name) {
 		super();
 		rect = new Rectangle(100, 100);
-		rect.setFill(Color.WHITE);
+		rect.setFill(defaultColor);
 		rect.setStroke(Color.BLACK);
 		text = new Text(name);
 		this.name = name;
@@ -74,8 +78,15 @@ public class Room extends StackPane {
 		return name;
 	}
 
-	public Rectangle getRect() {
-		return rect;
+	public void toggleHighlight() {
+		if (!isHighlighted) {
+			isHighlighted = true;
+			rect.setFill(highlightColor);
+		}
+		else {
+			isHighlighted = false;
+			rect.setFill(defaultColor);
+		}
 	}
 
 	private class Occupant {
