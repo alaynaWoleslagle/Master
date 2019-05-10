@@ -21,6 +21,8 @@ public class ConnectionScreen
 	private static int port = -1;
 	private UserInterface ui;
 
+	Text warningText;
+
     
     PlayerChoiceSpot[] playerChoiceSpots = new PlayerChoiceSpot[6];
     Rectangle[] characterChoices = new Rectangle[6];
@@ -73,7 +75,7 @@ public class ConnectionScreen
         /**
          * Create Blank Warning Text
          */
-        Text warningText = new Text("");
+        warningText = new Text("");
         warningText.setTranslateY(playerNameField.getTranslateY() + 75);
         
         /**
@@ -102,15 +104,15 @@ public class ConnectionScreen
             		// TODO: Make Text Field Box Highlighted in Red. Give notice to user to re-enter valid name
                         if (!validPlayerName(name) && !validPortNumber(gameIdField.getText()))
                         {
-                            warningText.setText("Invalid Name and Game ID");
+                            setWarningText("Invalid Name and Game ID");
                         }
                         else if (!validPlayerName(name))
                         {
-                            warningText.setText("Invalid Name");
+                            setWarningText("Invalid Name");
                         }
                         else
                         {
-                            warningText.setText("Invalid Game ID");
+                            setWarningText("Invalid Game ID");
                         }
             		// TODO: Figure out if every player needs a unique name
             	}
@@ -123,6 +125,11 @@ public class ConnectionScreen
 
         
         return connectionScene;
+	}
+
+	public void setWarningText(String text)
+	{
+		warningText.setText(text);
 	}
 	
 	/**
