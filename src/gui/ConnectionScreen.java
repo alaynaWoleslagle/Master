@@ -21,6 +21,8 @@ public class ConnectionScreen
 	private static int port = -1;
 	private UserInterface ui;
 
+	Text warningText;
+
     
     PlayerChoiceSpot[] playerChoiceSpots = new PlayerChoiceSpot[6];
     Rectangle[] characterChoices = new Rectangle[6];
@@ -56,6 +58,7 @@ public class ConnectionScreen
         playerNameField.setMaxWidth(200);
         playerNameField.setTranslateY(gameIdField.getTranslateY() + 100);
         
+       
         /**
          * Set the Text for Player Name.
          */
@@ -68,10 +71,17 @@ public class ConnectionScreen
         Button continueButton = new Button("Continue");
         continueButton.setTranslateY(playerNameField.getTranslateY() + 100);
 
+        
+        /**
+         * Create Blank Warning Text
+         */
+        warningText = new Text("");
+        warningText.setTranslateY(playerNameField.getTranslateY() + 75);
+        
         /**
          *  Add All objects to stack pane
          */
-        root.getChildren().addAll(gameIdText, gameIdField, playerNameField, playerNameText, continueButton);
+        root.getChildren().addAll(gameIdText, gameIdField, playerNameField, playerNameText, warningText, continueButton);
         Scene connectionScene = new Scene(root, 250, 500);
         
         /**
@@ -92,6 +102,18 @@ public class ConnectionScreen
             	else
             	{
             		// TODO: Make Text Field Box Highlighted in Red. Give notice to user to re-enter valid name
+                        if (!validPlayerName(name) && !validPortNumber(gameIdField.getText()))
+                        {
+                            setWarningText("Invalid Name and Game ID");
+                        }
+                        else if (!validPlayerName(name))
+                        {
+                            setWarningText("Invalid Name");
+                        }
+                        else
+                        {
+                            setWarningText("Invalid Game ID");
+                        }
             		// TODO: Figure out if every player needs a unique name
             	}
             
@@ -103,6 +125,11 @@ public class ConnectionScreen
 
         
         return connectionScene;
+	}
+
+	public void setWarningText(String text)
+	{
+		warningText.setText(text);
 	}
 	
 	/**
