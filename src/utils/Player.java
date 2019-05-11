@@ -1,6 +1,8 @@
 package utils;
 
 
+import java.util.ArrayList;
+
 /**
  * Player construct that holds all relevant information pertaining to a specific player.
  * 
@@ -14,7 +16,7 @@ public class Player
 	/** name: Name of player */
 	private volatile String name;
 
-    private volatile int [] position;
+    private volatile String position;
 	
 	/** playerId: Unique id associated with player */
 	private volatile int playerId;
@@ -24,6 +26,8 @@ public class Player
 	/** TODO: This is a place holder. 
 	 * Currently the player character is represented by a color on the UI.*/
 	private volatile int character;
+
+	private static ArrayList <String> hand;
 	
 	/**
 	 * Player Object constructor.
@@ -35,11 +39,13 @@ public class Player
 		setName(name);
 		setPlayerId(id);
 	}
-	public Player(String name, int id, int[] position)
+	public Player(String name, int id, String position, ArrayList <String> hand)
 	{
 		setName(name);
 		setPlayerId(id);
 		setPosition(position);
+		setHand(hand);
+
 	}
 	
 	
@@ -81,13 +87,13 @@ public class Player
      * Returns the position of the player
      * @param position
      */
-    public int[] getPosition() { return position; }
+    public String getPosition() { return position; }
 
     /**
      * Sets the position of the player
      * @param position
      */
-    public synchronized void setPosition(int[] position) { this.position = position; }
+    public synchronized void setPosition(String position) { this.position = position; }
 
 	/**
 	 * Returns the unique player Id for player.
@@ -106,6 +112,18 @@ public class Player
 	{
 		this.playerId = playerId;
 	}
+
+	/**
+	 * Returns the hand of the player
+	 * @param hand
+	 */
+	public ArrayList <String> getHand() { return hand; }
+
+	/**
+	 * Sets the hand of the player
+	 * @param hand
+	 */
+	public synchronized void setHand(ArrayList <String> hand) { this.hand = hand; }
 
 	/**
 	 * Returns the status of game start state.
