@@ -54,15 +54,13 @@ public class GameScreen {
 
 	private int tempDevIndex = 0;
 	private UserInterface ui;
-	private GameProcessor game;
 
 	//expects players in turn order
-	public GameScreen(String[] players, String[] cards, int assignedTurnIndex, GameProcessor game) {
+	public GameScreen(String[] players, String[] cards, int assignedTurnIndex) {
 		this.players = players;
 		numPlayers = players.length;
 		this.cards = cards;
 		this.assignedTurnIndex = assignedTurnIndex;
-		this.game = game;
 	}
 	
 	public Scene createScene() {
@@ -75,16 +73,23 @@ public class GameScreen {
 		String[] roomNames = {"Study", "Library", "Conservatory", "Hall", "Billiard Room", "Ballroom", "Lounge",
 				"Dining Room", "Kitchen"};
 		int roomIndex = 0;
+		String selectedRoom = roomNames[roomIndex];
+		String rightRoom = roomNames[roomIndex+3];
+		String belowRoom = roomNames[roomIndex+3];
 		for (int i = 0 ; i < 3 ; i++) {
 			for (int j = 0 ; j < 3 ; j++) {
 				int x = i * 200;
 				int y = j * 200;
-				Room room = new Room(x, y, roomNames[roomIndex]);
+				Room room = new Room(x, y, selectedRoom);
 				room.setOnMouseClicked(new EventHandler<MouseEvent>() {
 					@Override
 					public void handle(MouseEvent event) {
                         GameProcessor.getInstance();
-                        //GameProcessor.handleRoomMove(roomNames[roomIndex]);
+						Object [] outcome = GameProcessor.handleRoomMove(selectedRoom);
+						if((boolean) outcome[2]){
+							//TODO add player to the room
+							addPlayerToRoom(selectedRoom, (String) outcome[0], (Color) outcome[1]);
+						}
 					}
 				});
 				roomMap.put(room.getName(), room);
@@ -97,7 +102,11 @@ public class GameScreen {
 						@Override
 						public void handle(MouseEvent event) {
                             GameProcessor.getInstance();
-                            //GameProcessor.handleRightMove(roomNames[roomIndex]);
+							Object [] outcome = GameProcessor.handleRightMove(selectedRoom);
+							if((boolean) outcome[2]){
+								//TODO add player to the hallway
+								addPlayerToHallway(selectedRoom + "-" + rightRoom, (String) outcome[0], (Color) outcome[1]);
+							}
 						}
 					});
 					hallwayMap.put(roomNames[roomIndex] + "-" + roomNames[roomIndex + 3], hallway);
@@ -110,7 +119,11 @@ public class GameScreen {
 						@Override
 						public void handle(MouseEvent event) {
                             GameProcessor.getInstance();
-                            //GameProcessor.handleBelowMove(roomNames[roomIndex]);
+                            Object [] outcome = GameProcessor.handleBelowMove(selectedRoom);
+                            if((boolean) outcome[2]){
+                            	//TODO add player to the hallway
+								addPlayerToHallway(selectedRoom + "-" + belowRoom, (String) outcome[0], (Color) outcome[1]);
+							}
 						}
 					});
 					hallwayMap.put(roomNames[roomIndex] + "-" + roomNames[roomIndex + 1], hallway);
