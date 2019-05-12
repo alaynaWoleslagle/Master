@@ -18,6 +18,9 @@ import javafx.stage.Stage;
 import java.util.HashMap;
 import java.util.Map;
 
+import logic.GameProcessor;
+
+
 public class GameScreen {
 	private String[] characters = {"Miss Scarlet", "Col. Mustard", "Mrs. White", "Mr. Green", "Mrs. Peacock", "Prof. Plum"};
 
@@ -51,13 +54,15 @@ public class GameScreen {
 
 	private int tempDevIndex = 0;
 	private UserInterface ui;
+	private GameProcessor game;
 
 	//expects players in turn order
-	public GameScreen(String[] players, String[] cards, int assignedTurnIndex) {
+	public GameScreen(String[] players, String[] cards, int assignedTurnIndex, GameProcessor game) {
 		this.players = players;
 		numPlayers = players.length;
 		this.cards = cards;
 		this.assignedTurnIndex = assignedTurnIndex;
+		this.game = game;
 	}
 	
 	public Scene createScene() {
@@ -78,7 +83,8 @@ public class GameScreen {
 				room.setOnMouseClicked(new EventHandler<MouseEvent>() {
 					@Override
 					public void handle(MouseEvent event) {
-						//TODO
+                        GameProcessor.getInstance();
+                        //GameProcessor.handleRoomMove(roomNames[roomIndex]);
 					}
 				});
 				roomMap.put(room.getName(), room);
@@ -90,7 +96,8 @@ public class GameScreen {
 					hallway.setOnMouseClicked(new EventHandler<MouseEvent>() {
 						@Override
 						public void handle(MouseEvent event) {
-							//TODO
+                            GameProcessor.getInstance();
+                            //GameProcessor.handleRightMove(roomNames[roomIndex]);
 						}
 					});
 					hallwayMap.put(roomNames[roomIndex] + "-" + roomNames[roomIndex + 3], hallway);
@@ -102,7 +109,8 @@ public class GameScreen {
 					hallway.setOnMouseClicked(new EventHandler<MouseEvent>() {
 						@Override
 						public void handle(MouseEvent event) {
-							//TODO
+                            GameProcessor.getInstance();
+                            //GameProcessor.handleBelowMove(roomNames[roomIndex]);
 						}
 					});
 					hallwayMap.put(roomNames[roomIndex] + "-" + roomNames[roomIndex + 1], hallway);

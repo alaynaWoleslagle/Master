@@ -121,11 +121,11 @@ public class SuggestAccuseScreen {
 			@Override
 			public void handle(MouseEvent event) {
 				//TODO: massage to whatever method(s) GameProcessor provides for submitting suggestions and accussations
-//				if (isMakingSuggestion)
-//					GameProcessor.submitSuggestion(selectedCharacter, selectedWeapon, selectedRoom);
-//				else
-//					GameProcessor.submitAccusation(selectedCharacter, selectedWeapon, selectedRoom);
-//				System.out.println("Submitted: " + selectedCharacter + ", " + selectedWeapon + ", " + selectedRoom);
+				if (isMakingSuggestion)
+					GameProcessor.submitSuggestion(selectedCharacter, selectedWeapon, selectedRoom);
+				else
+					GameProcessor.submitAccusation(selectedCharacter, selectedWeapon, selectedRoom);
+				System.out.println("Submitted: " + selectedCharacter + ", " + selectedWeapon + ", " + selectedRoom);
 				stage.close();
 			}
 		});
