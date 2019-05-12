@@ -16,6 +16,7 @@ import utils.PlayerManager;
 
 import java.util.*;
 import java.util.HashMap;
+import javafx.scene.paint.Color;
 
 public class GameProcessor {
 	private static volatile GameProcessor instance = null;
@@ -175,12 +176,12 @@ public class GameProcessor {
 			/**
 			 *creates each player, gives them an id and a starting position, and puts them in a hashmap
 			 */
-			Player player1 = new Player("mustard", 0, "study", hands.get(0));
-			Player player2 = new Player("scarlet", 1, "loounge", hands.get(0));
-			Player player3 = new Player("plum", 2, "conservatory", hands.get(0));
-			Player player4 = new Player("green", 3, "kitchen", hands.get(0));
-			Player player5 = new Player("white", 4, "library", hands.get(0));
-			Player player6 = new Player("peacock", 5, "dining_room", hands.get(0));
+			Player player1 = new Player("Miss Scarlet", Color.RED, 0, "study", hands.get(0));
+			Player player2 = new Player("Col. Mustard", Color.PURPLE, 1, "loounge", hands.get(0));
+			Player player3 = new Player("Mrs. White", Color.GRAY, 2, "conservatory", hands.get(0));
+			Player player4 = new Player("Mr. Green", Color.YELLOW, 3, "kitchen", hands.get(0));
+			Player player5 = new Player("Mrs. Peacock", Color.GREEN, 4, "library", hands.get(0));
+			Player player6 = new Player("Prof. Plum", Color.BLUE, 5, "dining_room", hands.get(0));
 			players.put(0, player1);
 			players.put(1, player2);
 			players.put(2, player3);
@@ -206,42 +207,69 @@ public class GameProcessor {
 
 
 
-    public static boolean handleRoomMove(String room){
-        Player currentPlayer = players.get(turn);
+    public static Object [] handleRoomMove(String room){
+		Object[] returnVal = new Object[3];
+		Player currentPlayer = players.get(turn);
         String currentLocation = currentPlayer.getPosition();
+		String playerName = currentPlayer.getName();
+		Color playerColor = currentPlayer.getColor();
+		returnVal[0] = playerName;
+		returnVal[1] = playerColor;
+		returnVal[2] = false;
         String[] availableMoves = possibleMoves.get(currentLocation);
         turn = nextTurn(turn);
 
-        return Arrays.asList(availableMoves).contains(room);
+        if (Arrays.asList(availableMoves).contains(room)){
+			returnVal[2] = true;
+		}
+		return returnVal;
     }
-    public static boolean handleRightMove(String room){
+    public static Object [] handleRightMove(String room){
+		Object[] returnVal = new Object[3];
         String hallway = rightBelowHallways.get(room)[0];
 		Player currentPlayer = players.get(turn);
         String currentLocation = currentPlayer.getPosition();
+        String playerName = currentPlayer.getName();
+        Color playerColor = currentPlayer.getColor();
+        returnVal[0] = playerName;
+        returnVal[1] = playerColor;
+        returnVal[2] = false;
         String[] availableMoves = possibleMoves.get(currentLocation);
         turn = nextTurn(turn);
         for (int i=0; i<6; i++){
             Player checkPlayer = players.get(i);
             if(checkPlayer.getPosition().equals(hallway)){
-                return false;
+                return returnVal;
             }
         }
-        return Arrays.asList(availableMoves).contains(hallway);
+        if(Arrays.asList(availableMoves).contains(hallway)){
+        	returnVal[2] = true;
+		}
+        return returnVal;
     }
 
-    public static boolean handleBelowMove(String room){
+    public static Object [] handleBelowMove(String room){
+		Object[] returnVal = new Object[3];
         String hallway = rightBelowHallways.get(room)[1];
 		Player currentPlayer = players.get(turn);
         String currentLocation = currentPlayer.getPosition();
+		String playerName = currentPlayer.getName();
+		Color playerColor = currentPlayer.getColor();
+		returnVal[0] = playerName;
+		returnVal[1] = playerColor;
+		returnVal[2] = false;
         String[] availableMoves = possibleMoves.get(currentLocation);
         turn = nextTurn(turn);
         for (int i=0; i<6; i++){
             Player checkPlayer = players.get(i);
             if(checkPlayer.getPosition().equals(hallway)){
-                return false;
+                return returnVal;
             }
         }
-        return Arrays.asList(availableMoves).contains(hallway);
+		if(Arrays.asList(availableMoves).contains(hallway)){
+			returnVal[2] = true;
+		}
+		return returnVal;
     }
 
     public static String submitSuggestion(String character, String weapon, String room){

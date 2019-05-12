@@ -2,6 +2,7 @@ package utils;
 
 
 import java.util.ArrayList;
+import javafx.scene.paint.Color;
 
 /**
  * Player construct that holds all relevant information pertaining to a specific player.
@@ -27,6 +28,8 @@ public class Player
 	 * Currently the player character is represented by a color on the UI.*/
 	private volatile int character;
 
+	private volatile Color color;
+
 	private static ArrayList <String> hand;
 	
 	/**
@@ -39,12 +42,13 @@ public class Player
 		setName(name);
 		setPlayerId(id);
 	}
-	public Player(String name, int id, String position, ArrayList <String> hand)
+	public Player(String name, Color color, int id, String position, ArrayList <String> hand)
 	{
 		setName(name);
 		setPlayerId(id);
 		setPosition(position);
 		setHand(hand);
+		setColor(color);
 
 	}
 	
@@ -85,7 +89,7 @@ public class Player
 
     /**
      * Returns the position of the player
-     * @param position
+     * @return position
      */
     public String getPosition() { return position; }
 
@@ -94,6 +98,24 @@ public class Player
      * @param position
      */
     public synchronized void setPosition(String position) { this.position = position; }
+
+	/**
+	 * Returns the unique player Id for player.
+	 * @return uniqueId of player.
+	 */
+	public Color getColor()
+	{
+		return color;
+	}
+
+	/**
+	 * Sets unique playerId of player
+	 * @return color
+	 */
+	public synchronized void setColor(Color color)
+	{
+		this.color = color;
+	}
 
 	/**
 	 * Returns the unique player Id for player.
@@ -115,7 +137,7 @@ public class Player
 
 	/**
 	 * Returns the hand of the player
-	 * @param hand
+	 * @return hand
 	 */
 	public ArrayList <String> getHand() { return hand; }
 
