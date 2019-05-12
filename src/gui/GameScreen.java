@@ -54,7 +54,6 @@ public class GameScreen {
 
 	private int tempDevIndex = 0;
 	private UserInterface ui;
-	private GameProcessor game;
 
 	//expects players in turn order
 	public GameScreen(String[] players, String[] cards, int assignedTurnIndex, GameProcessor game) {
@@ -75,16 +74,19 @@ public class GameScreen {
 		String[] roomNames = {"Study", "Library", "Conservatory", "Hall", "Billiard Room", "Ballroom", "Lounge",
 				"Dining Room", "Kitchen"};
 		int roomIndex = 0;
+		String selectedRoom = roomNames[roomIndex];
 		for (int i = 0 ; i < 3 ; i++) {
 			for (int j = 0 ; j < 3 ; j++) {
 				int x = i * 200;
 				int y = j * 200;
-				Room room = new Room(x, y, roomNames[roomIndex]);
+				Room room = new Room(x, y, selectedRoom);
 				room.setOnMouseClicked(new EventHandler<MouseEvent>() {
 					@Override
 					public void handle(MouseEvent event) {
                         GameProcessor.getInstance();
-                        //GameProcessor.handleRoomMove(roomNames[roomIndex]);
+                        if(GameProcessor.handleRoomMove(selectedRoom)){
+							//TODO add player to the room
+						}
 					}
 				});
 				roomMap.put(room.getName(), room);
@@ -97,7 +99,9 @@ public class GameScreen {
 						@Override
 						public void handle(MouseEvent event) {
                             GameProcessor.getInstance();
-                            //GameProcessor.handleRightMove(roomNames[roomIndex]);
+                            if(GameProcessor.handleRightMove(selectedRoom){
+								//TODO add player to the hallway
+							}
 						}
 					});
 					hallwayMap.put(roomNames[roomIndex] + "-" + roomNames[roomIndex + 3], hallway);
@@ -110,7 +114,9 @@ public class GameScreen {
 						@Override
 						public void handle(MouseEvent event) {
                             GameProcessor.getInstance();
-                            //GameProcessor.handleBelowMove(roomNames[roomIndex]);
+                            if(GameProcessor.handleBelowMove(selectedRoom)){
+                            	//TODO add player to the hallway
+							}
 						}
 					});
 					hallwayMap.put(roomNames[roomIndex] + "-" + roomNames[roomIndex + 1], hallway);
