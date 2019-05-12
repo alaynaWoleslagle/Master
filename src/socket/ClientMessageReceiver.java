@@ -148,7 +148,6 @@ public class ClientMessageReceiver extends MessageReceiver
 		if(msg.getType() == Action.PLAYER_JOIN)
 		{
 			Player player = new Player(msg.getName(), msg.getPlayerId());
-			PlayerManager.addNewPlayer(player);
 			System.out.println("[NEW PLAYER]: Total Player Count: " + PlayerManager.playerCount());
 		}
 		else if(msg.getType() == Action.INIT)

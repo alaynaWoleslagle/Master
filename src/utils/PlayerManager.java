@@ -1,5 +1,4 @@
 package utils;
-
 import java.util.ArrayList;
 
 import messages.PlayerStatusMessage;
@@ -17,7 +16,6 @@ public class PlayerManager
     private static volatile PlayerManager instance = null;
     private static volatile ArrayList<Player> playerList = null;
     private static volatile Player player = null;
-
 	
     /**
      * Private PlayerManager constructor.
@@ -93,7 +91,6 @@ public class PlayerManager
     	}
     }
 
-
 	public static Player getPlayer() 
 	{
 		return player;
@@ -101,13 +98,14 @@ public class PlayerManager
 	
 	public static void setPlayer(Player obj)
 	{
-		player = obj;
+		player = obj;                
 	}
 	
 	public synchronized static void addNewPlayer(Player player)
-	{
-		playerList.add(player);
-		System.out.println("New Player: " + player);
+	{       
+                //sort the list by ID
+		playerList.add(player);               
+		System.out.println("New Player: " + player);          
 	}
 	
 	public synchronized static void removePlayer(Player player)
@@ -117,14 +115,23 @@ public class PlayerManager
 	
 	public static int playerCount()
 	{
-		return playerList.size() + 1;
+                System.out.println(playerList);
+		return playerList.size() + 2;
+                
 	}
 	
 	public synchronized static Player getOtherPlayer(int playerId)
 	{
-		return playerList.get(playerId);
+                for (Player currentPlayer : playerList)
+                {
+                    if (currentPlayer.getPlayerId() == playerId)
+                    {
+                        return currentPlayer;
+                    }
+                }
+                //Player not found, return Null
+                return null;
 	}
-        
 }
 
 
