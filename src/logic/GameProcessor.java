@@ -342,7 +342,7 @@ public class GameProcessor
 		return currentPlayer.getBlacklist();
 	}
 
-    public static void  processMessage(Object msg)
+    public static void  processMessage(Object obj)
     {
     	if( obj instanceof PlayerStatusMessage )
     	{
