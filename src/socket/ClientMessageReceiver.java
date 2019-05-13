@@ -1,10 +1,7 @@
 package socket;
 
 import logic.GameProcessor;
-import messages.BaseMessage.Action;
-import messages.PlayerStatusMessage;
-import utils.Player;
-import utils.PlayerManager;
+
 
 
 /**
@@ -67,7 +64,7 @@ public class ClientMessageReceiver extends MessageReceiver
 
 
     /**
-     * process
+     * Threaded function that processes messages from Message Queue as they are received by client socket.
      */
 	protected void process()
 	{
@@ -132,29 +129,8 @@ public class ClientMessageReceiver extends MessageReceiver
      */
     protected void processIncomingMessage(Object object)
     {
-    	if(object instanceof PlayerStatusMessage)
-    	{
-    		PlayerStatusMessage msg = (PlayerStatusMessage) object;
-
-    		processStatusMessage(msg);
-    	}
-
+    	System.out.println("About to receive message");
     	GameProcessor.processMessage(object);
-
     }
 
-    private void processStatusMessage(PlayerStatusMessage msg)
-    {
-		if(msg.getType() == Action.PLAYER_JOIN)
-		{
-			Player player = new Player(msg.getName(), msg.getPlayerId());
-			System.out.println("[NEW PLAYER]: Total Player Count: " + PlayerManager.playerCount());
-		}
-		else if(msg.getType() == Action.INIT)
-		{
-			Player player = new Player(msg.getName(), msg.getPlayerId());
-			PlayerManager.setPlayer(player);
-
-		}
-  }
 }

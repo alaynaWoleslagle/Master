@@ -102,18 +102,18 @@ public class ConnectionScreen
             	else
             	{
             		// TODO: Make Text Field Box Highlighted in Red. Give notice to user to re-enter valid name
-                        if (!validPlayerName(name) && !validPortNumber(gameIdField.getText()))
-                        {
-                            setWarningText("Invalid Name and Game ID");
-                        }
-                        else if (!validPlayerName(name))
-                        {
-                            setWarningText("Invalid Name");
-                        }
-                        else
-                        {
-                            setWarningText("Invalid Game ID");
-                        }
+            		if (!validPlayerName(name) && !validPortNumber(gameIdField.getText()))
+                    {
+                        setWarningText("Invalid Name and Game ID");
+                    }
+                    else if (!validPlayerName(name))
+                    {
+                        setWarningText("Invalid Name");
+                    }
+                    else
+                    {
+                        setWarningText("Invalid Game ID");
+                    }
             		// TODO: Figure out if every player needs a unique name
             	}
             

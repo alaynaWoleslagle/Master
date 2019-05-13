@@ -21,6 +21,7 @@ public class LobbyScreen
 {
 	private ArrayList<Player> players = new ArrayList<Player>();
     private Button readyButton;
+    private boolean isReady = false;
     private Text errorText;
     private int assignedPlayerIndex;
     private Group root = new Group();
@@ -135,10 +136,12 @@ public class LobbyScreen
 		playerGroup.getChildren().add(readyButton);
 		readyButton.setTranslateX(assignedPlayerIndex * 150);
 		
-		EventHandler<ActionEvent> readyClicked = new EventHandler<ActionEvent>() { 
+		EventHandler<ActionEvent> readyClicked = new EventHandler<ActionEvent>() 
+		{ 
             public void handle(ActionEvent e) 
             { 
-            		// TODO
+            	// Function call sends player ready status to GameProcessor to be processed.
+            	GameProcessor.updatePlayerReadyStatus(assignedPlayerIndex, !isReady);
             }
         };
         

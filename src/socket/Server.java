@@ -157,6 +157,7 @@ public class Server
 	{
 		for (ClientHandler outgoingClient : clients)
 		{
+			System.out.println("Sending Start");
 			outgoingClient.send(object);
 		}
 	}
@@ -172,7 +173,7 @@ public class Server
 		if( type == SendType.PLAYER_INIT)
 		{
 			PlayerStatusMessage player = (PlayerStatusMessage)object;	
-			player.setType(Action.INIT);
+			player.setType(Action.PLAYER_INIT);
 			outgoingClient.send(player);
 	
 			for (ClientHandler client : clients)
@@ -271,15 +272,18 @@ class ClientHandler
         					PlayerStatusMessage msg = (PlayerStatusMessage) object;
             				System.out.println("Made it 1");
 
-        					if(isInit == false && msg.getType() == Action.INIT)
+        					if(isInit == false && msg.getType() == Action.PLAYER_INIT)
         					{
                 				System.out.println("Made it 2");
         						playerInitialize(msg);
         					}
-        					else if(msg.getType() == Action.START)
+        					else if(msg.getType() == Action.PLAYER_START)
         		    		{
                 				System.out.println("Made it 3");
-        		    			msgReceiver.updatePlayerStartStatus(playerId);
+        		    			if (msgReceiver.updatePlayerStartStatus(playerId, msg.getVarField2()))
+        		    			{
+        		    				initializeGame();
+        		    			}
         		    		}
             				else if(msg.getType() == Action.PLAYER_SELECTION)
             				{
@@ -336,6 +340,13 @@ class ClientHandler
 		Server.broadcast(this, player);
 	}
 	
+	private void initializeGame()
+	{
+		System.out.println("STARTING GAME");
+		PlayerStatusMessage msg = new PlayerStatusMessage();
+		msg.setType(Action.GAME_START);
+		Server.servercast(msg);
+	}
 	private void updateCharacterSelection(PlayerStatusMessage msg)
 	{
 		if(msg.getPlayerId() == this.playerId)
@@ -344,7 +355,6 @@ class ClientHandler
 		}
 		System.out.println("Made it 11");
 		Server.broadcast(this, msg);
-		
 	}
 	
 

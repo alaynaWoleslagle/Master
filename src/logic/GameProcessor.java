@@ -3,9 +3,12 @@ package logic;
 import messages.GameLogicMessage;
 import messages.PlayerStatusMessage;
 import gui.LobbyScreen;
+import gui.GameScreen;
 import gui.UserInterface;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import messages.BaseMessage.Action;
+import messages.BaseMessage.MessageType;
 import socket.Client;
 import socket.ClientMessageReceiver;
 import socket.Server;
@@ -18,7 +21,8 @@ import java.util.*;
 import java.util.HashMap;
 import javafx.scene.paint.Color;
 
-public class GameProcessor {
+public class GameProcessor 
+{
 	private static volatile GameProcessor instance = null;
 
 	private static String[][] board;
@@ -35,7 +39,7 @@ public class GameProcessor {
 
 	private static ArrayList<String> solution = new ArrayList<>();
 
-	private ArrayList<String> hand1 = new ArrayList<>();
+	private static ArrayList<String> hand1 = new ArrayList<>();
 	private ArrayList<String> hand2 = new ArrayList<>();
 	private ArrayList<String> hand3 = new ArrayList<>();
 	private ArrayList<String> hand4 = new ArrayList<>();
@@ -47,35 +51,42 @@ public class GameProcessor {
 
 	private static boolean winner;
 
-	private static LobbyScreen lobby = null;
-	private static Scene lobbyScene = null;
-	private static UserInterface userInterface;
-
-	private static int turn = 0;
-
-	public static GameProcessor getInstance() {
-		if (instance == null) {
-			/**
-			 *  This is a thread-safe check to ensure another thread can't initialize another MessageReceiver class.
-			 */
-			synchronized (GameProcessor.class) {
-				if (instance == null) {
-					instance = new GameProcessor();
-				}
-
-			}
-		}
+	private static LobbyScreen lobbyScreen = null;
+	private static GameScreen gameScreen = null;
+    //private static Scene lobbyScene = null;
+    private static UserInterface userInterface;
+    private static int turn = 0;
+	
+    public static GameProcessor getInstance()
+    {
+        if (instance == null) 
+        { 
+        	/**
+        	 *  This is a thread-safe check to ensure another thread can't initialize another MessageReceiver class.
+        	 */
+            synchronized (GameProcessor.class) 
+            {
+                if (instance == null)
+                {
+                	instance = new GameProcessor();
+                }
+                
+            }
+        }
 
 		return instance;
 	}
 
-	private GameProcessor() {
+	private GameProcessor() 
+	{
 		/**
 		 *  This checks to ensure no other instance is created using Reflection API
 		 */
-		if (instance != null) {
+		if (instance != null) 
+		{
 			System.out.println("Exception Handled: Attempt to create new Instance using Reflection API");
-		} else {
+		} else 
+		{
 
 			winner = false;
 
@@ -112,13 +123,18 @@ public class GameProcessor {
 			 * deals the rest of the cards to the players
 			 */
 			hands.addAll(Arrays.asList(hand1, hand2, hand3, hand4, hand5, hand6));
-			for (int i = 0; i < 6; i++) {
+			for (int i = 0; i < 6; i++) 
+			{
 				ArrayList<String> currentHand = hands.get(i);
-				for (int j = 0; j < 3; j++) {
+				for (int j = 0; j < 3; j++) 
+				{
 					currentHand.add(cards.get(0));
 					cards.remove(0);
 				}
 			}
+			
+			//TXL TEST
+			//PlayerManager.getPlayer().setHand(hand1);
 
 			/**
 			 * sets each hallway to empty at the start, because each person starts in a room
@@ -224,7 +240,8 @@ public class GameProcessor {
 		}
 		return returnVal;
     }
-    public static Object [] handleRightMove(String room){
+    public static Object [] handleRightMove(String room)
+    {
 		Object[] returnVal = new Object[3];
         String hallway = rightBelowHallways.get(room)[0];
 		Player currentPlayer = players.get(turn);
@@ -236,13 +253,16 @@ public class GameProcessor {
         returnVal[2] = false;
         String[] availableMoves = possibleMoves.get(currentLocation);
         turn = nextTurn(turn);
-        for (int i=0; i<6; i++){
+        for (int i=0; i<6; i++)
+        {
             Player checkPlayer = players.get(i);
-            if(checkPlayer.getPosition().equals(hallway)){
+            if(checkPlayer.getPosition().equals(hallway))
+            {
                 return returnVal;
             }
         }
-        if(Arrays.asList(availableMoves).contains(hallway)){
+        if(Arrays.asList(availableMoves).contains(hallway))
+        {
         	returnVal[2] = true;
 		}
         return returnVal;
@@ -272,22 +292,29 @@ public class GameProcessor {
 		return returnVal;
     }
 
-    public static String submitSuggestion(String character, String weapon, String room){
+    public static String submitSuggestion(String character, String weapon, String room)
+    {
         Player currentPlayer = players.get(turn);
-        if (room.equals(currentPlayer.getPosition())){
-            for (int i=0; i<6; i++){
+        if (room.equals(currentPlayer.getPosition()))
+        {
+            for (int i=0; i<6; i++)
+            {
                 Player checkPlayer = players.get(i);
                 ArrayList<String> checkHand = checkPlayer.getHand();
-                if(checkHand.contains(character)){
+                if(checkHand.contains(character))
+                {
                     return character;
                 }
-                else if(checkHand.contains(weapon)){
+                else if(checkHand.contains(weapon))
+                {
                     return weapon;
                 }
-                else if (checkHand.contains(room)){
+                else if (checkHand.contains(room))
+                {
                     return room;
                 }
-                else{
+                else
+                {
                     return "";
                 }
             }
@@ -295,43 +322,61 @@ public class GameProcessor {
         return "cannot suggest from here";
     }
 
-    public static boolean submitAccusation(String character, String weapon, String room){
+    public static boolean submitAccusation(String character, String weapon, String room)
+    {
         Player currentPlayer = players.get(turn);
-        if(solution.contains(character) && solution.contains(weapon) && solution.contains(room)){
+        if(solution.contains(character) && solution.contains(weapon) && solution.contains(room))
+        {
             return true;
         }
-        else{
+        else
+        {
             return false;
         }
     }
 
-    public static void  processMessage(Object msg)
+    public static void  processMessage(Object obj)
     {
-    	if( msg instanceof PlayerStatusMessage )
+    	if( obj instanceof PlayerStatusMessage )
     	{
-        	PlayerStatusMessage tmpMsg = (PlayerStatusMessage)msg;
+        	PlayerStatusMessage msg = (PlayerStatusMessage)obj;
+        	System.out.println(msg.getType());
         	Player tmp = new Player();
-        	tmp.setName(tmpMsg.getName());
-        	tmp.setPlayerId(tmpMsg.getPlayerId());
-        	
-    		if(tmpMsg.getType() == Action.INIT)
+        	tmp.setName(msg.getName());
+        	tmp.setPlayerId(msg.getPlayerId());
+    		
+        	if(msg.getType() == Action.PLAYER_JOIN)
     		{
-    			PlayerManager.setPlayer(tmp);
+    			Player player = new Player(msg.getName(), msg.getPlayerId());
+    			PlayerManager.addNewPlayer(player);
+    			System.out.println("[NEW PLAYER]: Total Player Count: " + PlayerManager.playerCount());
     		}
-    		else if(tmpMsg.getType() == Action.PLAYER_JOIN)
+    		else if(msg.getType() == Action.PLAYER_INIT)
     		{
-        		PlayerManager.addNewPlayer(tmp);
+    			Player player = new Player(msg.getName(), msg.getPlayerId());
+    			PlayerManager.setPlayer(player);
     		}
-
-			if (lobby != null)
-			{
-				playerSelection(tmpMsg);
-			}
+    		else if(msg.getType() == Action.PLAYER_SELECTION)
+    		{
+    			if (lobbyScreen != null)
+    			{
+    				playerSelection(msg);
+    			}
+    		}
+    		else if(msg.getType() == Action.GAME_START)
+    		{
+    			System.out.println("Creating Game Scene");
+    			PlayerManager.getPlayer().setHand(hand1);
+    			if (lobbyScreen != null)
+    			{	
+    				createGame();
+    			}
+    		}
     	}
-        else if(msg instanceof GameLogicMessage)
+        else if(obj instanceof GameLogicMessage)
 		{
-            GameLogicMessage tmpMsg = (GameLogicMessage)msg;
-            if(tmpMsg.getType() == Action.TURN)
+            GameLogicMessage logicMsg = (GameLogicMessage)obj;
+            if(logicMsg.getType() == Action.TURN)
 			{
 
             }
@@ -386,10 +431,27 @@ public class GameProcessor {
 	
 	private static void createLobby()
 	{
-		System.out.println("Made it 6" + PlayerManager.getPlayer());
-		lobby = new LobbyScreen(PlayerManager.getPlayer().getPlayerId(), PlayerManager.getPlayer().getName());
-		lobbyScene = lobby.createScene();
+		lobbyScreen = new LobbyScreen(PlayerManager.getPlayer().getPlayerId(), PlayerManager.getPlayer().getName());
+		Scene lobbyScene = lobbyScreen.createScene();
 		userInterface.setScene(lobbyScene);
+	}
+	
+	/**
+	 * This function is responsible for generating the Game screen
+	 */
+	private static void createGame()
+	{
+		Platform.runLater(
+				new Runnable()
+				{
+					@Override 
+					public void run() 
+					{
+						gameScreen = new GameScreen();
+						Scene gameScene = gameScreen.createScene();
+						userInterface.setScene(gameScene);
+					}
+				});
 	}
 
 	/**
@@ -402,14 +464,17 @@ public class GameProcessor {
 	 */
 	public static void registerCharacterSelection(int playerId, int color)
 	{
+		PlayerManager.getPlayer().setCharacter(color);
+		
 		PlayerStatusMessage msg = new PlayerStatusMessage();
 		msg.setPlayerId(playerId);
 		msg.setVarField1(color);
 		msg.setType(Action.PLAYER_SELECTION);
+		msg.setMessageType(MessageType.UI_UPDATE);
 		
 		ClientMessageReceiver.sendMessage(msg);
-		System.out.println("TRAEEE Msg Sent");
 	}
+	
 	
 	public static void playerSelection(PlayerStatusMessage msg)
 	{
@@ -419,7 +484,25 @@ public class GameProcessor {
 			System.out.println("Made it 29");
 		}
 		
-		lobby.addPlayer(player.getName(), false, player.getPlayerId(), msg.getVarField1());
+		System.out.println(player);
+		System.out.println("Color:" + msg.getVarField1());
+
+		lobbyScreen.addPlayer(player.getName(), false, player.getPlayerId(), msg.getVarField1());
+	}
+	
+	public static void updatePlayerReadyStatus(int playerId, boolean isReady)
+	{
+		if (PlayerManager.updateReadyStatus(isReady))
+		{
+			PlayerStatusMessage msg = new PlayerStatusMessage();
+			
+			msg.setPlayerId(playerId);
+			msg.setVarField2(isReady);
+			msg.setType(Action.PLAYER_START);
+			msg.setMessageType(MessageType.UI_UPDATE);
+			
+			ClientMessageReceiver.sendMessage(msg);
+		}
 	}
 
 

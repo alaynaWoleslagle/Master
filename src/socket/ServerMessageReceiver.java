@@ -3,6 +3,7 @@ package socket;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import messages.BaseMessage.Action;
 import messages.PlayerStatusMessage;
@@ -67,25 +68,31 @@ public class ServerMessageReceiver extends MessageReceiver
     }
     
 	
-	protected synchronized boolean updatePlayerStartStatus(int id)
+    /**
+     * This function updates the player start status 
+     * @param id
+     * @param isReady
+     * @return true: is all players in game are ready
+     */
+	protected synchronized boolean updatePlayerStartStatus(int id, boolean isReady)
 	{
 		if(playerTruth.containsKey(id))
 		{
 			System.out.println("[TEST]: Player Start Status: " + playerTruth.get(id).isReady());
 
-			playerTruth.computeIfPresent(id, (k, c) -> updateStart(c, true) );
+			playerTruth.computeIfPresent(id, (k, c) -> updateStart(c, isReady) );
 			System.out.println("[TEST]: Player Start Status: " + playerTruth.get(id).isReady());
 		}
 		
-		return true;
+		return allPlayersReady();
 	}
     
     private Player updateStart(Player player, boolean ready)
     {
     	player.setReady(ready);
 		return player;
-    	
     }
+    
     /**
      * TODO: This function routes incoming messages to for main processing.
      * TODO: Game logic function should be called here. Function that receives Message and processes it.
@@ -97,7 +104,7 @@ public class ServerMessageReceiver extends MessageReceiver
     	{
     		PlayerStatusMessage msg = (PlayerStatusMessage) object;
     		
-    		if(msg.getType() == Action.START && playerTruth.containsKey(msg.getPlayerId()))
+    		if(msg.getType() == Action.PLAYER_START && playerTruth.containsKey(msg.getPlayerId()))
     		{
     			playerTruth.computeIfPresent(msg.getPlayerId(), (k, c) -> updateStart(c, true) );
     		}
@@ -129,6 +136,22 @@ public class ServerMessageReceiver extends MessageReceiver
     {
     	player.setCharacter(color);
     	return player;
+    }
+    
+    /**
+     * Returns true if all players are in ready status
+     * @return
+     */
+    private synchronized boolean allPlayersReady()
+    {
+        for (Entry<Integer, Player> entry : playerTruth.entrySet())
+        { 
+        	if(entry.getValue().isReady() == false)
+        	{
+        		return false;
+        	}
+        }
+        return true;
     }
 
 
