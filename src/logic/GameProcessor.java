@@ -28,7 +28,7 @@ public class GameProcessor
 	private static String[][] board;
 
 	private static Map<Integer, Player> players = new HashMap<Integer, Player>();
-	private static Map<String, String> hallways = new HashMap<String, String>();
+	private static Map<String, Integer> playerIds = new HashMap<>();
 	private static Map<String, String[]> possibleMoves = new HashMap<String, String[]>();
 	private static Map<String, String[]> rightBelowHallways = new HashMap<String, String[]>();
 
@@ -37,6 +37,7 @@ public class GameProcessor
 	private ArrayList<String> weaponCards = new ArrayList<>();
 	private ArrayList<String> playerCards = new ArrayList<>();
 
+	private static ArrayList<String> suggestion = new ArrayList<>();
 	private static ArrayList<String> solution = new ArrayList<>();
 
 	private static ArrayList<String> hand1 = new ArrayList<>();
@@ -49,7 +50,7 @@ public class GameProcessor
 
 	private static ArrayList<Integer> blacklist = new ArrayList<>();
 
-	private static boolean winner;
+	private static String winner;
 
 	private static LobbyScreen lobbyScreen = null;
 	private static GameScreen gameScreen = null;
@@ -87,8 +88,6 @@ public class GameProcessor
 			System.out.println("Exception Handled: Attempt to create new Instance using Reflection API");
 		} else 
 		{
-
-			winner = false;
 
 			/**
 			 * creates the deck of cards and shuffles them
@@ -137,22 +136,6 @@ public class GameProcessor
 			//PlayerManager.getPlayer().setHand(hand1);
 
 			/**
-			 * sets each hallway to empty at the start, because each person starts in a room
-			 */
-			hallways.put("hallway1", "empty");
-			hallways.put("hallway2", "empty");
-			hallways.put("hallway3", "empty");
-			hallways.put("hallway4", "empty");
-			hallways.put("hallway5", "empty");
-			hallways.put("hallway6", "empty");
-			hallways.put("hallway7", "empty");
-			hallways.put("hallway8", "empty");
-			hallways.put("hallway9", "empty");
-			hallways.put("hallway10", "empty");
-			hallways.put("hallway11", "empty");
-			hallways.put("hallway12", "empty");
-
-			/**
 			 * creates a basic board to use for logic testing
 			 */
 			possibleMoves.put("study", new String[]{"hallway1", "hallway3", "kitchen"});
@@ -192,18 +175,25 @@ public class GameProcessor
 			/**
 			 *creates each player, gives them an id and a starting position, and puts them in a hashmap
 			 */
-			Player player1 = new Player("Miss Scarlet", Color.RED, 0, "study", hands.get(0));
-			Player player2 = new Player("Col. Mustard", Color.PURPLE, 1, "loounge", hands.get(0));
-			Player player3 = new Player("Mrs. White", Color.GRAY, 2, "conservatory", hands.get(0));
-			Player player4 = new Player("Mr. Green", Color.YELLOW, 3, "kitchen", hands.get(0));
-			Player player5 = new Player("Mrs. Peacock", Color.GREEN, 4, "library", hands.get(0));
-			Player player6 = new Player("Prof. Plum", Color.BLUE, 5, "dining_room", hands.get(0));
+			Player player1 = new Player("Miss Scarlet", Color.RED, 0, "hallway2", hands.get(0));
+			Player player2 = new Player("Col. Mustard", Color.PURPLE, 1, "hallway5", hands.get(1));
+			Player player3 = new Player("Mrs. White", Color.GRAY, 2, "hallway12", hands.get(2));
+			Player player4 = new Player("Mr. Green", Color.YELLOW, 3, "hallway11", hands.get(3));
+			Player player5 = new Player("Mrs. Peacock", Color.GREEN, 4, "hallway8", hands.get(4));
+			Player player6 = new Player("Prof. Plum", Color.BLUE, 5, "hallway3", hands.get(5));
 			players.put(0, player1);
 			players.put(1, player2);
 			players.put(2, player3);
 			players.put(3, player4);
 			players.put(4, player5);
 			players.put(5, player6);
+
+			playerIds.put("Miss Scarlet", 0);
+			playerIds.put("Col. Mustard", 1);
+			playerIds.put("Mrs. White", 2);
+			playerIds.put("Mr. Green", 3);
+			playerIds.put("Mrs. Peacock", 4);
+			playerIds.put("Prof. Plum", 5);
 		}
 
 	}
@@ -292,13 +282,20 @@ public class GameProcessor
 		return returnVal;
     }
 
-    public static String submitSuggestion(String character, String weapon, String room)
-    {
+
+    public static void submitSuggestion(String character, String weapon, String room){
         Player currentPlayer = players.get(turn);
-        if (room.equals(currentPlayer.getPosition()))
-        {
-            for (int i=0; i<6; i++)
-            {
+
+        if (room.equals(currentPlayer.getPosition())){
+			int suggestedPlayerId = playerIds.get(character);
+			Player suggestedPlayer = players.get(suggestedPlayerId);
+			suggestedPlayer.setPosition(room);
+			suggestion.add(character);
+			suggestion.add(weapon);
+			suggestion.add(room);
+
+			/*
+        	for (int i=0; i<6; i++){
                 Player checkPlayer = players.get(i);
                 ArrayList<String> checkHand = checkPlayer.getHand();
                 if(checkHand.contains(character))
@@ -318,24 +315,34 @@ public class GameProcessor
                     return "";
                 }
             }
+            */
         }
-        return "cannot suggest from here";
+        //return "cannot suggest from here";
     }
 
-    public static boolean submitAccusation(String character, String weapon, String room)
-    {
+
+    public static void disproveSuggestion(String card){
+		if(suggestion.contains(card)){
+			suggestion.clear();
+		}
+	}
+
+    public static void submitAccusation(String character, String weapon, String room){
         Player currentPlayer = players.get(turn);
-        if(solution.contains(character) && solution.contains(weapon) && solution.contains(room))
-        {
-            return true;
+        if(solution.contains(character) && solution.contains(weapon) && solution.contains(room)){
+            winner = currentPlayer.getName();
         }
-        else
-        {
-            return false;
+        else{
+        	currentPlayer.setBlacklist();
         }
     }
 
-    public static void  processMessage(Object obj)
+    public static boolean playerBlacklisted(){
+		Player currentPlayer = players.get(turn);
+		return currentPlayer.getBlacklist();
+	}
+
+    public static void  processMessage(Object msg)
     {
     	if( obj instanceof PlayerStatusMessage )
     	{

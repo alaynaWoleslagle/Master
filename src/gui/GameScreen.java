@@ -203,6 +203,7 @@ public class GameScreen {
 			cardRect.setFill(Color.WHITE);
 			cardRect.setStroke(Color.BLACK);
 			Text cardText = new Text(cards[i]);
+			String disproveCard = cards[i];
 			cardText.setWrappingWidth(100);
 			cardText.setTextAlignment(TextAlignment.CENTER);
 			StackPane card = new StackPane(cardRect, cardText);
@@ -210,6 +211,8 @@ public class GameScreen {
 				@Override
 				public void handle(MouseEvent event) {
 					//TODO: call GameProcessor to submit card to dispove suggestion
+					GameProcessor.getInstance();
+					GameProcessor.disproveSuggestion(disproveCard);
 				}
 			});
 			handBox.getChildren().add(card);

@@ -30,7 +30,11 @@ public class Player
 
 	private volatile Color color;
 
-	private ArrayList <String> hand;
+
+
+	private static ArrayList <String> hand;
+
+	private volatile boolean blacklist = false;
 	
 	/**
 	 * Player Object constructor.
@@ -101,7 +105,7 @@ public class Player
     public synchronized void setPosition(String position) { this.position = position; }
 
 	/**
-	 * Returns the unique player Id for player.
+	 * Returns the color for player.
 	 * @return uniqueId of player.
 	 */
 	public Color getColor()
@@ -110,7 +114,7 @@ public class Player
 	}
 
 	/**
-	 * Sets unique playerId of player
+	 * Sets color of player
 	 * @return color
 	 */
 	public synchronized void setColor(Color color)
@@ -149,6 +153,21 @@ public class Player
 	public synchronized void setHand(ArrayList <String> hand) 
 	{ 
 		this.hand = hand; 
+	}
+
+
+	/**
+	 * Returns whether a player is blacklisted.
+	 * @return blacklist
+	 */
+	public boolean getBlacklist() { return blacklist; }
+
+	/**
+	 * Sets a player to blacklisted.
+	 */
+	public synchronized void setBlacklist()
+	{
+		this.blacklist = true;
 	}
 
 	/**
