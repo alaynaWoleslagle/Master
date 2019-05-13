@@ -311,6 +311,11 @@ public class GameProcessor {
         }
     }
 
+    public static boolean playerBlacklisted(){
+		Player currentPlayer = players.get(turn);
+		return currentPlayer.getBlacklist();
+	}
+
     public static void  processMessage(Object msg)
     {
     	if( msg instanceof PlayerStatusMessage )
