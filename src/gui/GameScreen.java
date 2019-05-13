@@ -1,6 +1,7 @@
 package gui;
 
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -372,6 +373,21 @@ public class GameScreen {
 	}
 	public void removeHomeSpace(String homeSpace) {
 		gameBoard.getChildren().remove(homeSpaceMap.get(homeSpace));
+	}
+	
+	public void showDialog(String textString)
+	{
+		Text text = new Text(textString);
+        StackPane endRoot = new StackPane();
+		Stage endStage = new Stage();
+		Scene endScene = new Scene(endRoot, 600, 400);
+        text.setTextAlignment(TextAlignment.CENTER);
+		StackPane.setAlignment(text, Pos.CENTER);
+		endRoot.getChildren().add(text);
+		endStage.setWidth(endScene.getWidth());
+		endStage.setHeight(endScene.getHeight());
+		endStage.setScene(endScene);
+		endStage.show();
 	}
 
 
