@@ -25,12 +25,12 @@ public abstract class BaseMessage implements Serializable
 	 */
 	public enum MessageType 
 	{ 
-
+		UI_UPDATE
 	} 
 	
 	public enum Action
 	{
-		INIT, PLAYER_JOIN, START, PLAYER_SELECTION, TURN;
+		PLAYER_INIT, PLAYER_JOIN, PLAYER_START, PLAYER_SELECTION, TURN, GAME_START;
 	}
 	
 	/**
@@ -38,7 +38,7 @@ public abstract class BaseMessage implements Serializable
 	 *       Message Type SHALL be set by the Client who is sending the Message.
 	 *       
 	 */
-	private Action type = Action.INIT;
+	private Action type;
 	
 	/**
 	 *  name: Player Name
@@ -63,6 +63,10 @@ public abstract class BaseMessage implements Serializable
 	 *       a message.
 	 */
 	private int varField1 = -1;
+	
+	private boolean varField2 = false;
+	
+	private MessageType messageType;
 	
 
 	/**
@@ -139,6 +143,38 @@ public abstract class BaseMessage implements Serializable
 	public void setVarField1(int varField1) 
 	{
 		this.varField1 = varField1;
+	}
+
+
+	public MessageType getMessageType() 
+	{
+		return messageType;
+	}
+
+
+	public void setMessageType(MessageType messageType) 
+	{
+		this.messageType = messageType;
+	}
+
+
+	/**
+	 * Get VarField2
+	 * @return
+	 */
+	public boolean getVarField2() 
+	{
+		return varField2;
+	}
+
+
+	/**
+	 * Set varField2
+	 * @param varField2
+	 */
+	public void setVarField2(boolean varField2) 
+	{
+		this.varField2 = varField2;
 	}
 	
 	

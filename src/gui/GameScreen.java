@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import logic.GameProcessor;
+import utils.PlayerManager;
 
 
 public class GameScreen {
@@ -61,6 +62,15 @@ public class GameScreen {
 		numPlayers = players.length;
 		this.cards = cards;
 		this.assignedTurnIndex = assignedTurnIndex;
+	}
+	
+	public GameScreen()
+	{
+		this.assignedTurnIndex = PlayerManager.getPlayer().getPlayerId();
+		// Returns a String[] indexed by playerId. 
+		this.cards = PlayerManager.getHandAsArray();
+		this.players = PlayerManager.GetPlayerNames();
+		numPlayers = PlayerManager.playerCount();
 	}
 	
 	public Scene createScene() {

@@ -30,6 +30,8 @@ public class Player
 
 	private volatile Color color;
 
+
+
 	private static ArrayList <String> hand;
 
 	private volatile boolean blacklist = false;
@@ -44,6 +46,7 @@ public class Player
 		setName(name);
 		setPlayerId(id);
 	}
+	
 	public Player(String name, Color color, int id, String position, ArrayList <String> hand)
 	{
 		setName(name);
@@ -147,7 +150,10 @@ public class Player
 	 * Sets the hand of the player
 	 * @param hand
 	 */
-	public synchronized void setHand(ArrayList <String> hand) { this.hand = hand; }
+	public synchronized void setHand(ArrayList <String> hand) 
+	{ 
+		this.hand = hand; 
+	}
 
 
 	/**
@@ -182,11 +188,13 @@ public class Player
 		this.isReady = isReady;
 	}
 
-	public int getCharacter() {
+	public int getCharacter() 
+	{
 		return character;
 	}
 
-	public void setCharacter(int character) {
+	public void setCharacter(int character) 
+	{
 		this.character = character;
 	}
 

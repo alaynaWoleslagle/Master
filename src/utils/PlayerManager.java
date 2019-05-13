@@ -1,5 +1,7 @@
 package utils;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import messages.PlayerStatusMessage;
 import messages.BaseMessage.Action;
@@ -14,7 +16,9 @@ import socket.ClientMessageReceiver;
 public class PlayerManager 
 {
     private static volatile PlayerManager instance = null;
-    private static volatile ArrayList<Player> playerList = null;
+    //private static volatile ArrayList<Player> playerList = null;
+    private static volatile Map<Integer,Player> playerList = null;
+
     private static volatile Player player = null;
 	
     /**
@@ -31,7 +35,8 @@ public class PlayerManager
         }
         else
         {
-        	playerList = new ArrayList<Player>();
+    		playerList = new HashMap<Integer, Player>();
+        	//playerList = new ArrayList<Player>();
         	player = new Player();
         	System.out.println("[INFO]: Player Manager Initialized.");
         }
@@ -72,7 +77,7 @@ public class PlayerManager
     {
     	PlayerStatusMessage message = new PlayerStatusMessage();
     	message.setName(name);
-    	message.setType(Action.INIT);
+    	message.setType(Action.PLAYER_INIT);
     	System.out.println("Client Action: Initializing new Client: " + name);
     	
     	ClientMessageReceiver.sendMessage(message);
@@ -96,6 +101,10 @@ public class PlayerManager
 		return player;
 	}
 	
+	/**
+	 * This function sets the Application Users Player Object. Not to be confused with other players joining the game.
+	 * @param obj
+	 */
 	public static void setPlayer(Player obj)
 	{
 		player = obj;                
@@ -104,34 +113,76 @@ public class PlayerManager
 	public synchronized static void addNewPlayer(Player player)
 	{       
                 //sort the list by ID
-		playerList.add(player);               
+		playerList.put(player.getPlayerId(), player);
+		//playerList.add(player);               
 		System.out.println("New Player: " + player);          
 	}
 	
 	public synchronized static void removePlayer(Player player)
 	{
-		playerList.remove(player);
+		playerList.remove(player.getPlayerId());
+		//playerList.remove(player);
 	}
 	
 	public static int playerCount()
 	{
-                System.out.println(playerList);
-		return playerList.size() + 2;
-                
+		return playerList.size() + 1;                
 	}
 	
 	public synchronized static Player getOtherPlayer(int playerId)
 	{
-                for (Player currentPlayer : playerList)
-                {
-                    if (currentPlayer.getPlayerId() == playerId)
-                    {
-                        return currentPlayer;
-                    }
-                }
+		return playerList.get(playerId);
+	
+     /*   for (Player currentPlayer : playerList)
+        {
+        	if (currentPlayer.getPlayerId() == playerId)
+        	{
+        		return currentPlayer;
+        	}
+        }
                 //Player not found, return Null
-                return null;
+                return null;*/
 	}
+	
+	/**
+	 * This function updates the Player status.
+	 * @param isReady current status of player
+	 * @return true: if player is ready to start game.
+	 */
+	public synchronized static boolean updateReadyStatus(boolean isReady)
+	{
+		player.setReady(isReady);
+		
+		//TODO: Check if player status is really being checked
+		return true;
+	}
+	
+	/**
+	 * Returns an String[] of Player names.
+	 * @return String[] of names
+	 */
+    public synchronized static String[] GetPlayerNames()
+    {
+    	String[] players = new String[playerCount()];
+        for (Entry<Integer, Player> entry : playerList.entrySet())
+        { 
+        	players[entry.getValue().getPlayerId()] = entry.getValue().getName();
+        }
+        players[player.getPlayerId()] = player.getName();
+        
+        return players;
+    }
+    
+    public synchronized static String[] getHandAsArray()
+    {
+    	String[] cards = new String[player.getHand().size()];
+    	
+    	for( int i = 0; i < player.getHand().size(); i++)
+    	{
+    		cards[i] = player.getHand().get(i);
+    	}
+    	return cards;
+    }
 }
 
 
