@@ -2,12 +2,16 @@ package gui;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 import logic.GameProcessor;
 
 /**
@@ -121,8 +125,6 @@ public class ConnectionScreen
         };
         
         continueButton.setOnAction(continueClicked);
-        
-
         
         return connectionScene;
 	}
