@@ -1,6 +1,12 @@
 package socket;
 
 import logic.GameProcessor;
+import messages.BaseMessage.Action;
+import messages.PlayerStatusMessage;
+import utils.PlayerCard;
+import utils.PlayerManager;
+import utils.RoomCard;
+import utils.WeaponCard;
 
 
 
@@ -130,6 +136,26 @@ public class ClientMessageReceiver extends MessageReceiver
     protected void processIncomingMessage(Object object)
     {
     	System.out.println("About to receive message");
+		
+    	if(object instanceof PlayerStatusMessage )
+    	{
+        	PlayerStatusMessage msg = (PlayerStatusMessage)object;
+
+    		if(msg.getType() == Action.PLAYER_INIT)
+    		{
+    			PlayerManager.getPlayer().setPlayerId(msg.getPlayerId());
+    			Object[] arr = new Object[3];
+    			arr = msg.getVarField3();
+    					
+    			PlayerManager.getPlayer().setRoomCard((RoomCard)arr[0]);
+    			PlayerManager.getPlayer().setPlayerCard((PlayerCard)arr[1]);
+    			PlayerManager.getPlayer().setWeaponCard((WeaponCard)arr[2]);
+    			
+    			System.out.println("TXL: " + PlayerManager.getPlayer().getPlayerCard() + " " + PlayerManager.getPlayer().getWeaponCard() + " " + PlayerManager.getPlayer().getRoomCard());
+
+    		}
+    	}
+
     	GameProcessor.processMessage(object);
     }
 

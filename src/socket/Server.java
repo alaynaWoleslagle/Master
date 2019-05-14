@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import messages.BaseMessage.Action;
+import utils.PlayerManager;
 import messages.PlayerStatusMessage;
 
 /**
@@ -270,16 +271,13 @@ class ClientHandler
         				if(object instanceof PlayerStatusMessage )
         		    	{
         					PlayerStatusMessage msg = (PlayerStatusMessage) object;
-            				System.out.println("Made it 1");
 
         					if(isInit == false && msg.getType() == Action.PLAYER_INIT)
         					{
-                				System.out.println("Made it 2");
-        						playerInitialize(msg);
+        						playerInitialize(msg, msgReceiver.generateCardDeck(false));
         					}
         					else if(msg.getType() == Action.PLAYER_START)
         		    		{
-                				System.out.println("Made it 3");
         		    			if (msgReceiver.updatePlayerStartStatus(playerId, msg.getVarField2()))
         		    			{
         		    				initializeGame();
@@ -287,7 +285,6 @@ class ClientHandler
         		    		}
             				else if(msg.getType() == Action.PLAYER_SELECTION)
             				{
-                				System.out.println("Made it 4");
                 				updateCharacterSelection(msg);
             				}
         		    	}
@@ -324,10 +321,11 @@ class ClientHandler
 	 * Sends Player initialization messages to other players and server.
 	 * @param player
 	 */
-	private void playerInitialize(PlayerStatusMessage player)
+	private void playerInitialize(PlayerStatusMessage player, Object[] arr)
 	{
 		this.playerName = player.getName();
 		player.setPlayerId(playerId);
+		player.setVarField3(arr);
 		
 		// Update Server
 		ServerMessageReceiver.addPlayer(player);

@@ -1,13 +1,20 @@
 package socket;
 
 
+
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.Set;
 
 import messages.BaseMessage.Action;
 import messages.PlayerStatusMessage;
 import utils.Player;
+import utils.PlayerCard;
+import utils.RoomCard;
+import utils.WeaponCard;
 
 /**
  * Singleton Class
@@ -25,6 +32,15 @@ public class ServerMessageReceiver extends MessageReceiver
 {
     private static volatile ServerMessageReceiver msgReceiver = null;
     private static volatile Map<Integer,Player> playerTruth = null;
+    private static volatile Object[] solutionDeck = null;
+    
+    /**
+     * These sets hold all unselectable cards
+     */
+    private volatile Set<RoomCard> room = null;
+    private volatile Set<WeaponCard> weapon = null;
+    private volatile Set<PlayerCard> player = null;
+
 
 	
 	private ServerMessageReceiver()
@@ -41,8 +57,17 @@ public class ServerMessageReceiver extends MessageReceiver
         	if(initialize())
         	{
         		playerTruth = new HashMap<Integer, Player>();
-        		System.out.println("[INFO]: Server Message Receiver Started.");
+        		room = new HashSet<RoomCard>();
+        		weapon = new HashSet<WeaponCard>();
+        		player = new HashSet<PlayerCard>();
+        		solutionDeck = new Object[3];
+        		
+        		Random rnd = new Random();
 
+            	solutionDeck[0] = generateRoom(rnd);
+        		solutionDeck[1] = generatePlayer(rnd);
+        		solutionDeck[2] = generateWeapon(rnd);
+        		
         	}
         }
 	}
@@ -78,10 +103,7 @@ public class ServerMessageReceiver extends MessageReceiver
 	{
 		if(playerTruth.containsKey(id))
 		{
-			System.out.println("[TEST]: Player Start Status: " + playerTruth.get(id).isReady());
-
 			playerTruth.computeIfPresent(id, (k, c) -> updateStart(c, isReady) );
-			System.out.println("[TEST]: Player Start Status: " + playerTruth.get(id).isReady());
 		}
 		
 		return allPlayersReady();
@@ -92,6 +114,7 @@ public class ServerMessageReceiver extends MessageReceiver
     	player.setReady(ready);
 		return player;
     }
+    
     
     /**
      * TODO: This function routes incoming messages to for main processing.
@@ -115,7 +138,61 @@ public class ServerMessageReceiver extends MessageReceiver
     	}
     }
     
+    protected synchronized Object[] generateCardDeck(boolean isTruth)
+    {
+    	Object[] arr = new Object[3];
+		Random rnd = new Random();
 
+		RoomCard roomCard = generateRoom(rnd);
+		PlayerCard playerCard = generatePlayer(rnd);
+		WeaponCard weaponCard = generateWeapon(rnd);
+		
+		arr[0] = roomCard;
+		arr[1] = playerCard;
+		arr[2] = weaponCard;
+		
+		return arr;
+    }
+    
+    private synchronized RoomCard generateRoom(Random rnd)
+    {
+		RoomCard roomCard = RoomCard.values()[rnd.nextInt(RoomCard.values().length)];
+		
+		while(room.contains(roomCard))
+		{
+			roomCard = RoomCard.values()[rnd.nextInt(RoomCard.values().length)];
+		}
+		room.add(roomCard);
+		
+		return roomCard;
+		
+    }
+    
+    private synchronized PlayerCard generatePlayer(Random rnd)
+    {
+		PlayerCard playerCard = PlayerCard.values()[rnd.nextInt(PlayerCard.values().length)];
+		
+		while(player.contains(playerCard))
+		{
+			playerCard = PlayerCard.values()[rnd.nextInt(PlayerCard.values().length)];
+		}
+		player.add(playerCard);
+		
+		return playerCard;
+    }
+    
+    private synchronized WeaponCard generateWeapon(Random rnd)
+    {
+    	WeaponCard weaponCard = WeaponCard.values()[rnd.nextInt(PlayerCard.values().length)];
+    	
+    	while(weapon.contains(weaponCard))
+    	{
+    		weaponCard = WeaponCard.values()[rnd.nextInt(PlayerCard.values().length)];
+    	}
+    	weapon.add(weaponCard);
+
+    	return weaponCard;
+    }
 
 	protected synchronized static void addPlayer(PlayerStatusMessage object) 
 	{

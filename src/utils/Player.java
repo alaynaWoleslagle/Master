@@ -1,7 +1,6 @@
 package utils;
 
 
-import java.util.ArrayList;
 import javafx.scene.paint.Color;
 
 /**
@@ -29,10 +28,13 @@ public class Player
 	private volatile int character;
 
 	private volatile Color color;
+	
+	private volatile PlayerCard playerCard;
+	private volatile WeaponCard weaponCard;
+	private volatile RoomCard roomCard;
 
 
 
-	private static ArrayList <String> hand;
 
 	private volatile boolean blacklist = false;
 	
@@ -47,12 +49,11 @@ public class Player
 		setPlayerId(id);
 	}
 	
-	public Player(String name, Color color, int id, String position, ArrayList <String> hand)
+	public Player(String name, Color color, int id, String position)
 	{
 		setName(name);
 		setPlayerId(id);
 		setPosition(position);
-		setHand(hand);
 		setColor(color);
 
 	}
@@ -140,21 +141,6 @@ public class Player
 		this.playerId = playerId;
 	}
 
-	/**
-	 * Returns the hand of the player
-	 * @return hand
-	 */
-	public ArrayList <String> getHand() { return hand; }
-
-	/**
-	 * Sets the hand of the player
-	 * @param hand
-	 */
-	public synchronized void setHand(ArrayList <String> hand) 
-	{ 
-		this.hand = hand; 
-	}
-
 
 	/**
 	 * Returns whether a player is blacklisted.
@@ -188,14 +174,44 @@ public class Player
 		this.isReady = isReady;
 	}
 
-	public int getCharacter() 
+	public synchronized int getCharacter() 
 	{
 		return character;
 	}
 
-	public void setCharacter(int character) 
+	public synchronized void setCharacter(int character) 
 	{
 		this.character = character;
+	}
+
+	public synchronized RoomCard getRoomCard() 
+	{
+		return roomCard;
+	}
+
+	public synchronized void setRoomCard(RoomCard roomCard) 
+	{
+		this.roomCard = roomCard;
+	}
+
+	public synchronized WeaponCard getWeaponCard() 
+	{
+		return weaponCard;
+	}
+
+	public synchronized void setWeaponCard(WeaponCard weaponCard) 
+	{
+		this.weaponCard = weaponCard;
+	}
+
+	public synchronized PlayerCard getPlayerCard() 
+	{
+		return playerCard;
+	}
+
+	public synchronized void setPlayerCard(PlayerCard playerCard) 
+	{
+		this.playerCard = playerCard;
 	}
 
 }

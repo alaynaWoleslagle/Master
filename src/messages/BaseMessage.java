@@ -66,6 +66,8 @@ public abstract class BaseMessage implements Serializable
 	
 	private boolean varField2 = false;
 	
+	private Object[] varField3;
+	
 	private MessageType messageType;
 	
 
@@ -175,6 +177,18 @@ public abstract class BaseMessage implements Serializable
 	public void setVarField2(boolean varField2) 
 	{
 		this.varField2 = varField2;
+	}
+
+
+	public Object[] getVarField3() 
+	{
+		return varField3;
+	}
+
+
+	public void setVarField3(Object[] varField3) 
+	{
+		this.varField3 = varField3;
 	}
 	
 	

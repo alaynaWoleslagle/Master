@@ -75,11 +75,12 @@ public class PlayerManager
 	 */
     public static void initializePlayer(String name)
     {
+    	player.setName(name);
+
     	PlayerStatusMessage message = new PlayerStatusMessage();
     	message.setName(name);
     	message.setType(Action.PLAYER_INIT);
     	System.out.println("Client Action: Initializing new Client: " + name);
-    	
     	ClientMessageReceiver.sendMessage(message);
     }
     
@@ -88,11 +89,11 @@ public class PlayerManager
      * This function is called when the server sends back a message containing the players unique ID.
      * @param obj Player Object received by server.
      */
-    public static void storInitPlayer(Player obj)
+    public static void storIniPlayer(Player obj)
     {
     	if (obj instanceof Player)
     	{
-    		PlayerManager.player = obj;
+    		player = obj;
     	}
     }
 
@@ -101,14 +102,6 @@ public class PlayerManager
 		return player;
 	}
 	
-	/**
-	 * This function sets the Application Users Player Object. Not to be confused with other players joining the game.
-	 * @param obj
-	 */
-	public static void setPlayer(Player obj)
-	{
-		player = obj;                
-	}
 	
 	public synchronized static void addNewPlayer(Player player)
 	{       
@@ -175,12 +168,14 @@ public class PlayerManager
     
     public synchronized static String[] getHandAsArray()
     {
-    	String[] cards = new String[player.getHand().size()];
+    	String[] cards = new String[3];
     	
-    	for( int i = 0; i < player.getHand().size(); i++)
-    	{
-    		cards[i] = player.getHand().get(i);
-    	}
+    	cards[0] = player.getPlayerCard().getValue();
+    	cards[1] = player.getRoomCard().getValue();
+    	cards[2] = player.getWeaponCard().getValue();
+    	
+    	System.out.println(cards[0] + " " + cards[1] + " " + cards[2]);
+
     	return cards;
     }
 }

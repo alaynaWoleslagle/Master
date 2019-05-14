@@ -32,21 +32,11 @@ public class GameProcessor
 	private static Map<String, String[]> possibleMoves = new HashMap<String, String[]>();
 	private static Map<String, String[]> rightBelowHallways = new HashMap<String, String[]>();
 
-	private ArrayList<String> cards = new ArrayList<>();
-	private ArrayList<String> roomCards = new ArrayList<>();
-	private ArrayList<String> weaponCards = new ArrayList<>();
-	private ArrayList<String> playerCards = new ArrayList<>();
+
 
 	private static ArrayList<String> suggestion = new ArrayList<>();
 	private static ArrayList<String> solution = new ArrayList<>();
-
-	private static ArrayList<String> hand1 = new ArrayList<>();
-	private ArrayList<String> hand2 = new ArrayList<>();
-	private ArrayList<String> hand3 = new ArrayList<>();
-	private ArrayList<String> hand4 = new ArrayList<>();
-	private ArrayList<String> hand5 = new ArrayList<>();
-	private ArrayList<String> hand6 = new ArrayList<>();
-	private ArrayList<ArrayList<String>> hands = new ArrayList<>();
+	private String[] cards;
 
 	private static ArrayList<Integer> blacklist = new ArrayList<>();
 
@@ -89,51 +79,6 @@ public class GameProcessor
 		} else 
 		{
 
-			/**
-			 * creates the deck of cards and shuffles them
-			 */
-			roomCards.addAll(Arrays.asList("Study", "Hall", "Lounge", "Library", "Billiard Room", "Dining Room", "Conservatory", "Ball Room", "Kitchen"));
-			weaponCards.addAll(Arrays.asList("Candlestick", "Knife", "Pipe", "Gun", "Rope", "Wrench"));
-			playerCards.addAll(Arrays.asList("Col. Mustard", "Miss Scarlet", "Prof. Plum", "Mr. Green", "Mrs. White", "Mrs. Peacock"));
-			Collections.shuffle(roomCards);
-			Collections.shuffle(weaponCards);
-			Collections.shuffle(playerCards);
-
-			/**
-			 * allocates three cards in the deck to the solution
-			 */
-
-			solution.add(roomCards.get(0));
-			solution.add(playerCards.get(0));
-			solution.add(weaponCards.get(0));
-			roomCards.remove(0);
-			playerCards.remove(0);
-			weaponCards.remove(0);
-
-			/**
-			 * shuffles the rest of the cards together
-			 */
-			cards.addAll(roomCards);
-			cards.addAll(playerCards);
-			cards.addAll(weaponCards);
-			Collections.shuffle(cards);
-
-			/**
-			 * deals the rest of the cards to the players
-			 */
-			hands.addAll(Arrays.asList(hand1, hand2, hand3, hand4, hand5, hand6));
-			for (int i = 0; i < 6; i++) 
-			{
-				ArrayList<String> currentHand = hands.get(i);
-				for (int j = 0; j < 3; j++) 
-				{
-					currentHand.add(cards.get(0));
-					cards.remove(0);
-				}
-			}
-			
-			//TXL TEST
-			//PlayerManager.getPlayer().setHand(hand1);
 
 			/**
 			 * creates a basic board to use for logic testing
@@ -170,30 +115,6 @@ public class GameProcessor
 			rightBelowHallways.put("ballroom", new String[]{"hallway12", ""});
 			rightBelowHallways.put("kitchen", new String[]{"", ""});
 
-
-
-			/**
-			 *creates each player, gives them an id and a starting position, and puts them in a hashmap
-			 */
-			Player player1 = new Player("Miss Scarlet", Color.RED, 0, "hallway2", hands.get(0));
-			Player player2 = new Player("Col. Mustard", Color.PURPLE, 1, "hallway5", hands.get(1));
-			Player player3 = new Player("Mrs. White", Color.GRAY, 2, "hallway12", hands.get(2));
-			Player player4 = new Player("Mr. Green", Color.YELLOW, 3, "hallway11", hands.get(3));
-			Player player5 = new Player("Mrs. Peacock", Color.GREEN, 4, "hallway8", hands.get(4));
-			Player player6 = new Player("Prof. Plum", Color.BLUE, 5, "hallway3", hands.get(5));
-			players.put(0, player1);
-			players.put(1, player2);
-			players.put(2, player3);
-			players.put(3, player4);
-			players.put(4, player5);
-			players.put(5, player6);
-
-			playerIds.put("Miss Scarlet", 0);
-			playerIds.put("Col. Mustard", 1);
-			playerIds.put("Mrs. White", 2);
-			playerIds.put("Mr. Green", 3);
-			playerIds.put("Mrs. Peacock", 4);
-			playerIds.put("Prof. Plum", 5);
 		}
 
 	}
@@ -358,11 +279,6 @@ public class GameProcessor
     			PlayerManager.addNewPlayer(player);
     			System.out.println("[NEW PLAYER]: Total Player Count: " + PlayerManager.playerCount());
     		}
-    		else if(msg.getType() == Action.PLAYER_INIT)
-    		{
-    			Player player = new Player(msg.getName(), msg.getPlayerId());
-    			PlayerManager.setPlayer(player);
-    		}
     		else if(msg.getType() == Action.PLAYER_SELECTION)
     		{
     			if (lobbyScreen != null)
@@ -373,7 +289,6 @@ public class GameProcessor
     		else if(msg.getType() == Action.GAME_START)
     		{
     			System.out.println("Creating Game Scene");
-    			PlayerManager.getPlayer().setHand(hand1);
     			if (lobbyScreen != null)
     			{	
     				createGame();
