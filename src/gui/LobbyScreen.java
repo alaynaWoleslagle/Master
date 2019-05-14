@@ -104,15 +104,29 @@ public class LobbyScreen
 		Group characterGroup = new Group();
 		HBox characterHbox = new HBox(10);
 		Color[] characterColors = {Color.DARKRED, Color.YELLOW, Color.WHITE, Color.GREEN, Color.CADETBLUE, Color.PLUM};
+                
+                 // set up character names
+                Group charNameGroup = new Group();
+                Text plum = new Text("Prof. Plum");
+                Text red = new Text ("Miss Scarlet");
+                Text yellow = new Text ("Col. Mustard");
+                Text white = new Text ("Mrs. White");
+                Text green = new Text ("Mr. Green");
+                Text pea = new Text ("Mrs. Peacock");
+                Text [] charName = {red, yellow, white, green, pea, plum};
+                   
 		for (int j = 0; j < characterChoices.length; j++)
 		{
 			characterChoices[j] = new Rectangle(50, 100, 150, 150);
 			characterChoices[j].setFill(characterColors[j]);
 			characterChoices[j].setStroke(Color.BLACK);
 			characterHbox.getChildren().add(characterChoices[j]);
+                        charName[j].setLayoutX(50 + 161*j);
+                        charName[j].setLayoutY(75);
+                        charNameGroup.getChildren().add(charName[j]);
 		}
 		characterGroup.getChildren().add(characterHbox);
-		
+                	
 		// When player clicks color, update their choice box
 		PlayerChoiceSpot currentPlayerSpot = playerChoiceSpots[assignedPlayerIndex];
 		for (Rectangle character : characterChoices)
@@ -152,7 +166,7 @@ public class LobbyScreen
         errorText.setLayoutY(400);
 		errorText.setLayoutX(50);
 		
-		root.getChildren().addAll(playerGroup, characterGroup, errorText);
+		root.getChildren().addAll(playerGroup, characterGroup, charNameGroup, errorText);
 		return new Scene(root, 1000, 800);
 	}
 	
