@@ -120,6 +120,7 @@ public class SuggestAccuseScreen {
 		submitBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
+				GameProcessor.getInstance();
 				//TODO: massage to whatever method(s) GameProcessor provides for submitting suggestions and accussations
 				if (isMakingSuggestion)
 					GameProcessor.submitSuggestion(selectedCharacter, selectedWeapon, selectedRoom);

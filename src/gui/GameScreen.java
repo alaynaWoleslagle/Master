@@ -214,6 +214,7 @@ public class GameScreen {
 					//TODO: call GameProcessor to submit card to dispove suggestion
 					GameProcessor.getInstance();
 					GameProcessor.disproveSuggestion(disproveCard);
+
 				}
 			});
 			handBox.getChildren().add(card);
@@ -236,6 +237,10 @@ public class GameScreen {
 				suggestStage.setHeight(suggestScene.getHeight());
 				suggestStage.setScene(suggestScene);
 				suggestStage.show();
+
+				GameProcessor.getInstance();
+				GameProcessor.skipToDisprovingPlayer();
+
 			}
 		});
 		accuseBtn = new Button("Make Accusation");
@@ -249,6 +254,16 @@ public class GameScreen {
 				accuseStage.setHeight(accuseScene.getHeight());
 				accuseStage.setScene(accuseScene);
 				accuseStage.show();
+
+				GameProcessor.getInstance();
+				if(GameProcessor.getWinner()){
+					showDialog("Congratulations!");
+				}
+				else{
+					showDialog("Sorry, that is incorrect. You can no longer make moves.");
+					disableSuggestionButton();
+					disableAccusationButton();
+				}
 			}
 		});
 		VBox controlsBox = new VBox(10, suggestBtn, accuseBtn);
@@ -285,6 +300,9 @@ public class GameScreen {
 			currentTurnIndex = 0;
 		}
 		turnRects[currentTurnIndex].setStroke(ACTIVE_PLAYER_COLOR);
+
+		GameProcessor.getInstance();
+		GameProcessor.setNextTurn();
 	}
 
 	public void setMainPlayersCurrentRoom(String room) {
@@ -406,6 +424,10 @@ public class GameScreen {
 			@Override
 			public void handle(MouseEvent event) {
 				startNextTurn();
+				GameProcessor.getInstance();
+				while (GameProcessor.playerBlacklisted())
+					startNextTurn();
+
 			}
 		});
 		Button btn2 = new Button("add to text");
