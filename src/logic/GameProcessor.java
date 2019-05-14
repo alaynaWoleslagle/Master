@@ -92,9 +92,9 @@ public class GameProcessor
 			/**
 			 * creates the deck of cards and shuffles them
 			 */
-			roomCards.addAll(Arrays.asList("study", "hall", "lounge", "library", "billiard_room", "dining_room", "conservatory", "ball_room", "kitchen"));
-			weaponCards.addAll(Arrays.asList("candlestick", "knife", "pipe", "gun", "rope", "wrench"));
-			playerCards.addAll(Arrays.asList("mustard", "scarlet", "plum", "green", "white", "peacock"));
+			roomCards.addAll(Arrays.asList("Study", "Hall", "Lounge", "Library", "Billiard Room", "Dining Room", "Conservatory", "Ball Room", "Kitchen"));
+			weaponCards.addAll(Arrays.asList("Candlestick", "Knife", "Pipe", "Gun", "Rope", "Wrench"));
+			playerCards.addAll(Arrays.asList("Col. Mustard", "Miss Scarlet", "Prof. Plum", "Mr. Green", "Mrs. White", "Mrs. Peacock"));
 			Collections.shuffle(roomCards);
 			Collections.shuffle(weaponCards);
 			Collections.shuffle(playerCards);
