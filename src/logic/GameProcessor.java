@@ -13,8 +13,7 @@ import socket.Client;
 import socket.ClientMessageReceiver;
 import socket.Server;
 import socket.ServerMessageReceiver;
-import utils.Player;
-import utils.PlayerManager;
+import utils.*;
 
 
 import java.util.*;
@@ -35,10 +34,8 @@ public class GameProcessor
 
 
 	private static ArrayList<String> suggestion = new ArrayList<>();
-	private static ArrayList<String> solution = new ArrayList<>();
 	private String[] cards;
 
-	private static ArrayList<Integer> blacklist = new ArrayList<>();
 
 	public static boolean winner;
 
@@ -120,26 +117,16 @@ public class GameProcessor
 
 	}
 
-	public static int nextTurn(int turn) {
-		if(turn==6)
-
-		{
-			return 0;
-		}
-		else
-
-		{
-			return turn + 1;
-		}
-	}
-
 	public static void setNextTurn(){
-    	turn = nextTurn(turn);
+		ServerMessageReceiver.getInstance();
+		ServerMessageReceiver.nextTurn();
 	}
 
 
     public static Object [] handleRoomMove(String room){
-		Object[] returnVal = new Object[3];
+		ServerMessageReceiver.getInstance();
+		turn = ServerMessageReceiver.getTurn();
+    	Object[] returnVal = new Object[3];
 		Player currentPlayer = players.get(turn);
         String currentLocation = currentPlayer.getPosition();
 		String playerName = currentPlayer.getName();
@@ -148,7 +135,7 @@ public class GameProcessor
 		returnVal[1] = playerColor;
 		returnVal[2] = false;
         String[] availableMoves = possibleMoves.get(currentLocation);
-        turn = nextTurn(turn);
+        ServerMessageReceiver.nextTurn();
 
         if (Arrays.asList(availableMoves).contains(room)){
 			returnVal[2] = true;
@@ -157,6 +144,8 @@ public class GameProcessor
     }
     public static Object [] handleRightMove(String room)
     {
+		ServerMessageReceiver.getInstance();
+		turn = ServerMessageReceiver.getTurn();
 		Object[] returnVal = new Object[3];
         String hallway = rightBelowHallways.get(room)[0];
 		Player currentPlayer = players.get(turn);
@@ -167,7 +156,7 @@ public class GameProcessor
         returnVal[1] = playerColor;
         returnVal[2] = false;
         String[] availableMoves = possibleMoves.get(currentLocation);
-        turn = nextTurn(turn);
+        ServerMessageReceiver.nextTurn();
         for (int i=0; i<6; i++)
         {
             Player checkPlayer = players.get(i);
@@ -184,6 +173,8 @@ public class GameProcessor
     }
 
     public static Object [] handleBelowMove(String room){
+		ServerMessageReceiver.getInstance();
+		turn = ServerMessageReceiver.getTurn();
 		Object[] returnVal = new Object[3];
         String hallway = rightBelowHallways.get(room)[1];
 		Player currentPlayer = players.get(turn);
@@ -194,7 +185,7 @@ public class GameProcessor
 		returnVal[1] = playerColor;
 		returnVal[2] = false;
         String[] availableMoves = possibleMoves.get(currentLocation);
-        turn = nextTurn(turn);
+        ServerMessageReceiver.nextTurn();
         for (int i=0; i<6; i++){
             Player checkPlayer = players.get(i);
             if(checkPlayer.getPosition().equals(hallway)){
@@ -209,7 +200,9 @@ public class GameProcessor
 
 
     public static void submitSuggestion(String character, String weapon, String room){
-        Player currentPlayer = players.get(turn);
+		ServerMessageReceiver.getInstance();
+		turn = ServerMessageReceiver.getTurn();
+    	Player currentPlayer = players.get(turn);
 
         if (room.equals(currentPlayer.getPosition())){
 			int suggestedPlayerId = playerIds.get(character);
@@ -218,27 +211,31 @@ public class GameProcessor
 			suggestion.add(character);
 			suggestion.add(weapon);
 			suggestion.add(room);
+			ServerMessageReceiver.setSuggestion(suggestion);
         }
     }
 
     public static boolean HandDisproves(int currentDisproverId){
     	Player currentDisprover = players.get(currentDisproverId);
-		ArrayList <String> disproverHand = currentDisprover.getHand();
-		for(int i = 0; i<3; i++){
-			if(disproverHand.contains(suggestion.get(i))){
-				return true;
-			}
+		PlayerCard playerCard = currentDisprover.getPlayerCard();
+		WeaponCard weaponCard = currentDisprover.getWeaponCard();
+		RoomCard roomCard = currentDisprover.getRoomCard();
+		suggestion = ServerMessageReceiver.getSuggestion();
+		if(suggestion.contains(playerCard.getValue()) || suggestion.contains(weaponCard.getValue()) || suggestion.contains(roomCard.getValue())){
+			return true;
 		}
 		return false;
 	}
 
 	public static void skipToDisprovingPlayer(){
-    	disprovingTurn = turn+1;
-    	while(disprovingTurn!=turn){
+		ServerMessageReceiver.getInstance();
+		turn = ServerMessageReceiver.getTurn();
+    	ServerMessageReceiver.setDisproveTurn(turn);
+    	while(ServerMessageReceiver.getDisproveTurn()!=turn){
     		if(HandDisproves(disprovingTurn)){
     			break;
 			}
-			disprovingTurn = nextTurn(disprovingTurn);
+			ServerMessageReceiver.nextDisproveTurn();
 		}
 	}
 
@@ -249,8 +246,11 @@ public class GameProcessor
 	}
 
     public static void submitAccusation(String character, String weapon, String room){
+		ServerMessageReceiver.getInstance();
+		turn = ServerMessageReceiver.getTurn();
         Player currentPlayer = players.get(turn);
-        if(solution.contains(character) && solution.contains(weapon) && solution.contains(room)){
+		ServerMessageReceiver.getInstance();
+        if(ServerMessageReceiver.validateAccusation(character, weapon, room)){
             winner = true;
         }
         else{
@@ -263,8 +263,10 @@ public class GameProcessor
 	}
 
     public static boolean playerBlacklisted(){
+		ServerMessageReceiver.getInstance();
+		turn = ServerMessageReceiver.getTurn();
 		Player currentPlayer = players.get(turn);
-		turn = nextTurn(turn);
+		ServerMessageReceiver.nextTurn();
 		return currentPlayer.getBlacklist();
 	}
 
