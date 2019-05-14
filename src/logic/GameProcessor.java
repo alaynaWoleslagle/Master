@@ -50,13 +50,14 @@ public class GameProcessor
 
 	private static ArrayList<Integer> blacklist = new ArrayList<>();
 
-	private static String winner;
+	public static boolean winner;
 
 	private static LobbyScreen lobbyScreen = null;
 	private static GameScreen gameScreen = null;
     //private static Scene lobbyScene = null;
     private static UserInterface userInterface;
     private static int turn = 0;
+    private static int disprovingTurn;
 	
     public static GameProcessor getInstance()
     {
@@ -211,6 +212,9 @@ public class GameProcessor
 		}
 	}
 
+	public static void setNextTurn(){
+    	turn = nextTurn(turn);
+	}
 
 
     public static Object [] handleRoomMove(String room){
@@ -293,33 +297,29 @@ public class GameProcessor
 			suggestion.add(character);
 			suggestion.add(weapon);
 			suggestion.add(room);
-
-			/*
-        	for (int i=0; i<6; i++){
-                Player checkPlayer = players.get(i);
-                ArrayList<String> checkHand = checkPlayer.getHand();
-                if(checkHand.contains(character))
-                {
-                    return character;
-                }
-                else if(checkHand.contains(weapon))
-                {
-                    return weapon;
-                }
-                else if (checkHand.contains(room))
-                {
-                    return room;
-                }
-                else
-                {
-                    return "";
-                }
-            }
-            */
         }
-        //return "cannot suggest from here";
     }
 
+    public static boolean HandDisproves(int currentDisproverId){
+    	Player currentDisprover = players.get(currentDisproverId);
+		ArrayList <String> disproverHand = currentDisprover.getHand();
+		for(int i = 0; i<3; i++){
+			if(disproverHand.contains(suggestion.get(i))){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void skipToDisprovingPlayer(){
+    	disprovingTurn = turn+1;
+    	while(disprovingTurn!=turn){
+    		if(HandDisproves(disprovingTurn)){
+    			break;
+			}
+			disprovingTurn = nextTurn(disprovingTurn);
+		}
+	}
 
     public static void disproveSuggestion(String card){
 		if(suggestion.contains(card)){
@@ -330,15 +330,20 @@ public class GameProcessor
     public static void submitAccusation(String character, String weapon, String room){
         Player currentPlayer = players.get(turn);
         if(solution.contains(character) && solution.contains(weapon) && solution.contains(room)){
-            winner = currentPlayer.getName();
+            winner = true;
         }
         else{
         	currentPlayer.setBlacklist();
         }
     }
 
+    public static boolean getWinner(){
+    	return winner;
+	}
+
     public static boolean playerBlacklisted(){
 		Player currentPlayer = players.get(turn);
+		turn = nextTurn(turn);
 		return currentPlayer.getBlacklist();
 	}
 
