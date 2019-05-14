@@ -2,13 +2,10 @@ package socket;
 
 
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
 
+import gui.Room;
 import messages.BaseMessage.Action;
 import messages.PlayerStatusMessage;
 import utils.Player;
@@ -40,6 +37,9 @@ public class ServerMessageReceiver extends MessageReceiver
     private volatile Set<RoomCard> room = null;
     private volatile Set<WeaponCard> weapon = null;
     private volatile Set<PlayerCard> player = null;
+	private static int currentTurn = 0;
+	private static int disproveTurn;
+	private static ArrayList<String> currentSuggestion = new ArrayList<>();
 
 
 	
@@ -230,6 +230,63 @@ public class ServerMessageReceiver extends MessageReceiver
         }
         return true;
     }
+
+	public static void nextTurn() {
+		if(currentTurn==5)
+
+		{
+			currentTurn = 0;
+		}
+		else
+
+		{
+			currentTurn = currentTurn + 1;
+		}
+	}
+
+	public static void setDisproveTurn(int turn){
+		disproveTurn= turn+1;
+	}
+	public static int getDisproveTurn(){
+		return disproveTurn;
+	}
+	public static void nextDisproveTurn(){
+		if(disproveTurn==5)
+
+		{
+			disproveTurn = 0;
+		}
+		else
+
+		{
+			disproveTurn = disproveTurn + 1;
+		}
+	}
+
+
+
+	public static int getTurn(){
+    	return currentTurn;
+	}
+
+    public static boolean validateAccusation(String room, String player, String weapon){
+		RoomCard solutionRoom = (RoomCard) solutionDeck[0];
+		PlayerCard solutionPlayer = (PlayerCard) solutionDeck[1];
+		WeaponCard solutionWeapon = (WeaponCard) solutionDeck[2];
+    	if (room.equals(solutionRoom.getValue()) & player.equals(solutionPlayer.getValue())& weapon.equals(solutionWeapon.getValue())){
+    		return true;
+		}
+		else{
+			return false;
+		}
+	}
+
+	public static void setSuggestion (ArrayList <String> suggestion){
+    	currentSuggestion = suggestion;
+	}
+	public static ArrayList<String> getSuggestion (){
+    	return currentSuggestion;
+	}
 
 
 }
