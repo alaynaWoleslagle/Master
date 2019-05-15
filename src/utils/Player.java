@@ -49,15 +49,6 @@ public class Player
 		setPlayerId(id);
 	}
 	
-	public Player(String name, Color color, int id, String position)
-	{
-		setName(name);
-		setPlayerId(id);
-		setPosition(position);
-		setColor(color);
-
-	}
-	
 	
 	/**
 	 * Default Player Object constructor.
@@ -104,24 +95,6 @@ public class Player
      * @param position
      */
     public synchronized void setPosition(String position) { this.position = position; }
-
-	/**
-	 * Returns the color for player.
-	 * @return uniqueId of player.
-	 */
-	public Color getColor()
-	{
-		return color;
-	}
-
-	/**
-	 * Sets color of player
-	 * @return color
-	 */
-	public synchronized void setColor(Color color)
-	{
-		this.color = color;
-	}
 
 	/**
 	 * Returns the unique player Id for player.
@@ -212,6 +185,58 @@ public class Player
 	public synchronized void setPlayerCard(PlayerCard playerCard) 
 	{
 		this.playerCard = playerCard;
+	}
+
+	public Color getColor(){
+		return color;
+	}
+	public void setColor(int colorNum)
+	{
+
+		if(colorNum == 0)
+		{
+			color = Color.DARKRED;
+			position = "hallway2";
+			name = "Miss Scarlet";
+
+		}
+		else if(colorNum ==1)
+		{
+			color = Color.YELLOW;
+			position = "hallway11";
+			name = "Mr. Green";
+		}
+		else if(colorNum==2)
+		{
+			color = Color.WHITE;
+			position = "hallway12";
+			name = "Mrs. White";
+		}
+		else if(colorNum==3)
+		{
+			color = Color.GREEN;
+			position = "hallway8";
+			name = "Mrs. Peacock";
+
+		}
+		else if(colorNum==4)
+		{
+			color = Color.CADETBLUE;
+			position = "hallway3";
+			name = "Prof. Plum";
+		}
+		else if(colorNum==5)
+		{
+			color = Color.PLUM;
+			position = "hallway5";
+			name = "Col. Mustard";
+		}
+		else
+		{
+			color = null;
+			position = null;
+			name = null;
+		}
 	}
 
 }

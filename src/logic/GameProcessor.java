@@ -23,6 +23,7 @@ import javafx.scene.paint.Color;
 public class GameProcessor 
 {
 	private static volatile GameProcessor instance = null;
+	private static PlayerStatusMessage statusMsg;
 
 	private static String[][] board;
 
@@ -200,18 +201,23 @@ public class GameProcessor
 
 
     public static void submitSuggestion(String character, String weapon, String room){
-		ServerMessageReceiver.getInstance();
-		turn = ServerMessageReceiver.getTurn();
-    	Player currentPlayer = players.get(turn);
-
+		Player currentPlayer = PlayerManager.getPlayer();
         if (room.equals(currentPlayer.getPosition())){
-			int suggestedPlayerId = playerIds.get(character);
-			Player suggestedPlayer = players.get(suggestedPlayerId);
-			suggestedPlayer.setPosition(room);
-			suggestion.add(character);
-			suggestion.add(weapon);
-			suggestion.add(room);
-			ServerMessageReceiver.setSuggestion(suggestion);
+        	PlayerStatusMessage msg = new PlayerStatusMessage();
+        	msg.setPlayerId(PlayerManager.getPlayer().getPlayerId());
+        	msg.setType(Action.SUGGESTION);
+        	String [] suggestion = new String[3];
+        	suggestion[0] = character;
+        	suggestion[1] = weapon;
+        	suggestion[2] = room;
+        	msg.setVarField3(suggestion);
+        	int temp = msg.getPlayerId()+1;
+        	if (temp>PlayerManager.playerCount()){
+        		temp=0;
+			}
+			msg.setVarField1(temp);
+        	ClientMessageReceiver.sendMessage(msg);
+
         }
     }
 
@@ -288,6 +294,7 @@ public class GameProcessor
     		}
     		else if(msg.getType() == Action.PLAYER_SELECTION)
     		{
+    			PlayerManager.updatePlayerColor(msg.getPlayerId(), msg.getVarField1());
     			if (lobbyScreen != null)
     			{
     				playerSelection(msg);
@@ -301,6 +308,15 @@ public class GameProcessor
     				createGame();
     			}
     		}
+    		else if(msg.getType()==Action.SUGGESTION){
+    			if(msg.getVarField1()==PlayerManager.getPlayer().getPlayerId()){
+    				if(gameScreen!=null){
+    					statusMsg = msg;
+						gameScreen.indicateDisprovingPlayer(PlayerManager.getPlayer().getPlayerId());
+					}
+
+				}
+			}
     	}
         else if(obj instanceof GameLogicMessage)
 		{
