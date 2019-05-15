@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -253,6 +254,7 @@ public class GameScreen {
 			@Override
 			public void handle(MouseEvent event) {
 				Stage suggestStage = new Stage();
+				suggestStage.getIcons().add(new Image("file:resources/wildcards_icon.png"));
 				SuggestAccuseScreen suggestScreen = new SuggestAccuseScreen(suggestStage, mainPlayersCurrentRoom);
 				Scene suggestScene = suggestScreen.createScene();
 				suggestStage.setWidth(suggestScene.getWidth());
@@ -271,6 +273,7 @@ public class GameScreen {
 			@Override
 			public void handle(MouseEvent event) {
 				Stage accuseStage = new Stage();
+				accuseStage.getIcons().add(new Image("file:resources/wildcards_icon.png"));
 				SuggestAccuseScreen accuseScreen = new SuggestAccuseScreen(accuseStage);
 				Scene accuseScene = accuseScreen.createScene();
 				accuseStage.setWidth(accuseScene.getWidth());
@@ -421,6 +424,7 @@ public class GameScreen {
 		Text text = new Text(textString);
         StackPane endRoot = new StackPane();
 		Stage endStage = new Stage();
+		endStage.getIcons().add(new Image("file:resources/wildcards_icon.png"));
 		Scene endScene = new Scene(endRoot, 600, 400);
         text.setTextAlignment(TextAlignment.CENTER);
 		StackPane.setAlignment(text, Pos.CENTER);
