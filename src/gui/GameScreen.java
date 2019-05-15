@@ -56,6 +56,9 @@ public class GameScreen {
 
 	private int tempDevIndex = 0;
 	private UserInterface ui;
+	private String selectedRoom;
+	private String rightRoom;
+	private String belowRoom;
 
 	//expects players in turn order
 	public GameScreen(String[] players, String[] cards, int assignedTurnIndex) {
@@ -84,9 +87,9 @@ public class GameScreen {
 		String[] roomNames = {"Study", "Library", "Conservatory", "Hall", "Billiard Room", "Ballroom", "Lounge",
 				"Dining Room", "Kitchen"};
 		int roomIndex = 0;
-		String selectedRoom = roomNames[roomIndex];
-		String rightRoom = roomNames[roomIndex+3];
-		String belowRoom = roomNames[roomIndex+3];
+		selectedRoom = roomNames[roomIndex];
+		rightRoom = roomNames[roomIndex+3];
+		belowRoom = roomNames[roomIndex+3];
 		for (int i = 0 ; i < 3 ; i++) {
 			for (int j = 0 ; j < 3 ; j++) {
 				int x = i * 200;
@@ -142,6 +145,23 @@ public class GameScreen {
 				}
 
 				++roomIndex;
+				if (roomIndex < 9) {
+					selectedRoom = roomNames[roomIndex];
+					if ((roomIndex + 1) % 3 != 0) {
+						belowRoom = roomNames[roomIndex+1];
+					}
+					// no room below 
+					else {
+						belowRoom = "";
+					}
+					
+					if (roomIndex < 6) {
+						rightRoom = roomNames[roomIndex+3];
+					}
+					else {
+						rightRoom = "";
+					}
+				}
 			}
 		}
 		Hallway scarletHome = new Hallway(325, -15, 50, 50);
