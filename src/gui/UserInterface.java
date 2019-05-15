@@ -3,6 +3,7 @@ package gui;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -19,6 +20,7 @@ public class UserInterface extends Application
 	@Override
 	public void start(Stage stage) throws Exception 
 	{
+		stage.getIcons().add(new Image("file:resources/wildcards_icon.png"));
 		this.stage = stage;
 
 		Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
