@@ -287,6 +287,9 @@ class ClientHandler
             				{
                 				updateCharacterSelection(msg);
             				}
+            				else if (msg.getType()==Action.SUGGESTION){
+            					sendSuggestion(msg);
+							}
         		    	}
 
         			}
@@ -354,6 +357,10 @@ class ClientHandler
 		System.out.println("Made it 11");
 		Server.broadcast(this, msg);
 	}
+
+	private void sendSuggestion(PlayerStatusMessage msg){
+		Server.broadcast(this, msg);
+	}
 	
 
 	
@@ -378,5 +385,5 @@ class ClientHandler
 
 enum SendType 
 {
-		PLAYER_INIT, NORMAL;
+		PLAYER_INIT, NORMAL, SUGGESTION;
 }

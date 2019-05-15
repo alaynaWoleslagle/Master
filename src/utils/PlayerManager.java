@@ -1,4 +1,5 @@
 package utils;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -178,6 +179,20 @@ public class PlayerManager
 
     	return cards;
     }
+	public static void updatePlayerColor(int id, int color)
+	{
+		if(playerList.containsKey(id))
+		{
+			playerList.computeIfPresent(id, (k, c) -> updateColor(c, color) );
+		}
+	}
+
+	private static Player updateColor(Player player, int color)
+	{
+		player.setColor(color);
+		return player;
+	}
+
 }
 
 

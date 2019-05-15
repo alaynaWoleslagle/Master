@@ -30,7 +30,7 @@ public abstract class BaseMessage implements Serializable
 	
 	public enum Action
 	{
-		PLAYER_INIT, PLAYER_JOIN, PLAYER_START, PLAYER_SELECTION, TURN, GAME_START;
+		PLAYER_INIT, PLAYER_JOIN, PLAYER_START, PLAYER_SELECTION, TURN, GAME_START, SUGGESTION;
 	}
 	
 	/**
@@ -52,6 +52,8 @@ public abstract class BaseMessage implements Serializable
 	 *            responsible for Maintaining Official Player list.
 	 */
 	private int playerId = -1;
+
+
 	
 	
 	/**
@@ -67,10 +69,17 @@ public abstract class BaseMessage implements Serializable
 	private boolean varField2 = false;
 	
 	private Object[] varField3;
+
+	private String position;
 	
 	private MessageType messageType;
-	
 
+
+
+
+	public String getPosition(){return position;}
+
+	public void setPosition(String position){this.position = position;}
 	/**
 	 * Returns Player name.
 	 * @return  Player name

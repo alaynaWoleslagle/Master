@@ -234,7 +234,6 @@ public class GameScreen {
 				@Override
 				public void handle(MouseEvent event) {
 					//TODO: call GameProcessor to submit card to dispove suggestion
-					GameProcessor.getInstance();
 					GameProcessor.disproveSuggestion(disproveCard);
 
 				}
