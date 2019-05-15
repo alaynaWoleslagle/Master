@@ -151,6 +151,20 @@ public class PlayerManager
 		return true;
 	}
 	
+	public synchronized static int getPlayerId(String name)
+	{
+		int playerId = -1;
+        for (Entry<Integer, Player> entry : playerList.entrySet())
+        { 
+        	if(entry.getValue().getName().equals(name))
+        	{
+        		playerId = entry.getValue().getPlayerId();
+        	}
+        }
+        return playerId;
+	}
+	
+	
 	/**
 	 * Returns an String[] of Player names.
 	 * @return String[] of names
@@ -167,6 +181,20 @@ public class PlayerManager
         return players;
     }
     
+    public synchronized static String getCharacterName(int index)
+    {
+    	Player player = null;
+    	player = playerList.get(index);
+    	String name = "";
+    	if(player != null)
+    	{
+    		name = player.getName(); 
+    	}
+    	return name;
+    }
+    
+    
+    
     public synchronized static String[] getHandAsArray()
     {
     	String[] cards = new String[3];
@@ -181,10 +209,14 @@ public class PlayerManager
     }
 	public static void updatePlayerColor(int id, int color)
 	{
+		System.out.println("ID: " + id + " Color: " + color);
 		if(playerList.containsKey(id))
 		{
 			playerList.computeIfPresent(id, (k, c) -> updateColor(c, color) );
 		}
+		
+		System.out.println("Color: " + playerList.get(id).getColor() + " Name: " + playerList.get(id).getName());
+		
 	}
 
 	private static Player updateColor(Player player, int color)

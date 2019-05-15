@@ -45,7 +45,6 @@ public class Player
 	 */
 	public Player(String name, int id)
 	{
-		setName(name);
 		setPlayerId(id);
 	}
 	
@@ -192,10 +191,9 @@ public class Player
 	}
 	public void setColor(int colorNum)
 	{
-
 		if(colorNum == 0)
 		{
-			color = Color.DARKRED;
+			color = Color.RED;
 			position = "hallway2";
 			name = "Miss Scarlet";
 
@@ -208,7 +206,7 @@ public class Player
 		}
 		else if(colorNum==2)
 		{
-			color = Color.WHITE;
+			color = Color.GRAY;
 			position = "hallway12";
 			name = "Mrs. White";
 		}
@@ -221,13 +219,13 @@ public class Player
 		}
 		else if(colorNum==4)
 		{
-			color = Color.CADETBLUE;
+			color = Color.BLUE;
 			position = "hallway3";
 			name = "Prof. Plum";
 		}
 		else if(colorNum==5)
 		{
-			color = Color.PLUM;
+			color = Color.PURPLE;
 			position = "hallway5";
 			name = "Col. Mustard";
 		}
