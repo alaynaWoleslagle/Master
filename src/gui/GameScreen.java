@@ -6,6 +6,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -247,6 +248,7 @@ public class GameScreen {
 
 		//Controls Display
 		suggestBtn = new Button("Make Suggestion");
+		suggestBtn.setTooltip(new Tooltip("Make a suggestion of guilty person, weapon, and room"));
 		suggestBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
@@ -264,6 +266,7 @@ public class GameScreen {
 			}
 		});
 		accuseBtn = new Button("Make Accusation");
+		accuseBtn.setTooltip(new Tooltip("Make a final accusation of guilty person, weapon, and room"));
 		accuseBtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {

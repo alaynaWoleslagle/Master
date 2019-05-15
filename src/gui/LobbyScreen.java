@@ -8,6 +8,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -149,6 +150,7 @@ public class LobbyScreen
 		readyButton.setLayoutX(currentPlayerSpot.getLayoutX());
 		playerGroup.getChildren().add(readyButton);
 		readyButton.setTranslateX(assignedPlayerIndex * 150);
+		readyButton.setTooltip(new Tooltip("After selecting a character, click this to move on to the game screen"));
 		
 		EventHandler<ActionEvent> readyClicked = new EventHandler<ActionEvent>() 
 		{ 
