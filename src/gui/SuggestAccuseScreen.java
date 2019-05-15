@@ -23,8 +23,7 @@ public class SuggestAccuseScreen {
 
 	private String[] characters = {"Miss Scarlet", "Col. Mustard", "Mrs. White", "Mr. Green", "Mrs. Peacock", "Prof. Plum"};
 	private String[] weapons = {"Rope", "Lead Pipe", "Knife", "Wrench", "Candlestick", "Revolver"};
-	private String[] rooms = {"Study", "Library", "Conservatory", "Hall", "Billiard Room", "Ballroom", "Lounge",
-			"Dining Room", "Kitchen"};
+	private String[] rooms = {"Study", "Library", "Conservatory", "Hall", "Billiard Room", "Ballroom", "Lounge", "Dining Room", "Kitchen"};
 
 	private String selectedCharacter;
 	private String selectedWeapon;
@@ -52,10 +51,12 @@ public class SuggestAccuseScreen {
 		this.isMakingSuggestion = false;
 	}
 	
-	public Scene createScene() {
+	public Scene createScene() 
+	{
 		//suggestion/accusation selection area
 		HBox charactersBox = new HBox();
-		for (String character : characters) {
+		for (String character : characters) 
+		{
 			Rectangle rect = new Rectangle(100, 175);
 			rect.setFill(UNSELECTED_COLOR);
 			rect.setStroke(Color.BLACK);
@@ -70,8 +71,10 @@ public class SuggestAccuseScreen {
 			characterRectMap.put(character, rect);
 			charactersBox.getChildren().add(characterSelect);
 		}
+		
 		HBox weaponsBox = new HBox();
-		for (String weapon : weapons) {
+		for (String weapon : weapons) 
+		{
 			Rectangle rect = new Rectangle(100, 175);
 			rect.setFill(UNSELECTED_COLOR);
 			rect.setStroke(Color.BLACK);
@@ -86,32 +89,25 @@ public class SuggestAccuseScreen {
 			weaponRectMap.put(weapon, rect);
 			weaponsBox.getChildren().add(weaponSelect);
 		}
+		
 		HBox roomsBox = new HBox();
-		for (String room : rooms) {
+		for (String room : rooms) 
+		{
 			Rectangle rect = new Rectangle(100, 175);
+			rect.setFill(UNSELECTED_COLOR);
 			rect.setStroke(Color.BLACK);
 			Text text = new Text(room);
 			StackPane roomSelect = new StackPane(rect, text);
-			roomRectMap.put(room, rect);
-			if (isMakingSuggestion) {
-				if (room.equals(selectedRoom)) {
-					rect.setFill(SELECTED_COLOR);
-				}
-				else {
-					rect.setFill(DISABLED_COLOR);
-				}
-			}
-			else {
-				rect.setFill(UNSELECTED_COLOR);
-				roomSelect.setOnMouseClicked(new EventHandler<MouseEvent>() {
+			roomSelect.setOnMouseClicked(new EventHandler<MouseEvent>() {
 					@Override
 					public void handle(MouseEvent event) {
 						setSelectedRoom(room);
 					}
 				});
-			}
+			roomRectMap.put(room, rect);
 			roomsBox.getChildren().add(roomSelect);
 		}
+		
 		VBox rows = new VBox(20, charactersBox, weaponsBox, roomsBox);
 		Group selections = new Group(rows);
 

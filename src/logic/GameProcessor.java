@@ -124,7 +124,8 @@ public class GameProcessor
 	}
 
 
-    public static Object [] handleRoomMove(String room){
+    public static Object [] handleRoomMove(String room)
+    {
 		ServerMessageReceiver.getInstance();
 		turn = ServerMessageReceiver.getTurn();
     	Object[] returnVal = new Object[3];

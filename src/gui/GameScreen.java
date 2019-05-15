@@ -77,9 +77,12 @@ public class GameScreen {
 		this.cards = PlayerManager.getHandAsArray();
 		this.players = PlayerManager.GetPlayerNames();
 		numPlayers = PlayerManager.playerCount();
+		System.out.println("Index: " + this.assignedTurnIndex + " Count: " + numPlayers );
+
 	}
 	
-	public Scene createScene() {
+	public Scene createScene() 
+	{
 		root = new Group();
 
 		//Game Board Display
@@ -179,6 +182,16 @@ public class GameScreen {
 		Hallway plumHome = new Hallway(-15, 125, 50, 50);
 		homeSpaceMap.put(characters[5], plumHome);
 		gameBoard.getChildren().addAll(scarletHome, mustardHome, whiteHome, greenHome, peacockHome, plumHome);
+		
+
+		addPlayerToHomeSpace("Prof. Plum", "p1", colors[5]);
+		addPlayerToHomeSpace("Miss Scarlet", "p2", colors[0]);
+		addPlayerToHomeSpace("Mrs. White", "p3", colors[2]);
+		addPlayerToHomeSpace("Mr. Green", "p4", colors[3]);
+		addPlayerToHomeSpace("Mrs. Peacock", "p5", colors[4]);
+		addPlayerToHomeSpace("Col. Mustard", "p6", colors[1]);
+
+
 
 		gameBoard.setLayoutX(root.getLayoutX() + 50);
 		gameBoard.setLayoutY(root.getLayoutY() + 50);
@@ -406,9 +419,9 @@ public class GameScreen {
 		hallwayMap.get(hallway).toggleHighlight();
 	}
 
-	public void addPlayerToHomeSpace(String homeSpace, String player, Color color) {
+	public void addPlayerToHomeSpace(String homeSpace, String name, Color color) {
 		if (!homeSpaceMap.get(homeSpace).isOccupied()) {
-			homeSpaceMap.get(homeSpace).addOccupant(player, color);
+			homeSpaceMap.get(homeSpace).addOccupant(name, color);
 		}
 	}
 	public void removePlayerFromHomeSpace(String homeSpace) {
